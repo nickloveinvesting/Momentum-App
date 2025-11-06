@@ -38,9 +38,36 @@ const app: Application = express();
 app.use(helmet()); // Set security headers
 
 // CORS configuration
+const corsOrigins = process.env.CORS_ORIGIN
+  ? process.env.CORS_ORIGIN.split(',').map(origin => origin.trim())
+  : '*';
+
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN || '*',
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) return callback(null, true);
+
+      // If CORS_ORIGIN is *, allow all
+      if (corsOrigins === '*') return callback(null, true);
+
+      // Check if origin is in the allowed list
+      if (Array.isArray(corsOrigins) && corsOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      // Allow all Vercel preview deployments
+      if (origin.endsWith('.vercel.app')) {
+        return callback(null, true);
+      }
+
+      // Allow localhost for development
+      if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
+        return callback(null, true);
+      }
+
+      callback(new Error('Not allowed by CORS'));
+    },
     credentials: true,
   })
 );
