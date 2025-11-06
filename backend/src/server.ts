@@ -141,7 +141,7 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
 async function startServer() {
   try {
     // Test database connection (skip in Vercel)
-    if (process.env.VERCEL !== '1') {
+    if (!process.env.VERCEL) {
       console.log('🔌 Testing database connection...');
       const dbConnected = await testConnection();
 
@@ -200,7 +200,7 @@ async function startServer() {
 }
 
 // Graceful shutdown (disabled for Vercel serverless)
-if (process.env.VERCEL !== '1') {
+if (!process.env.VERCEL) {
   process.on('SIGTERM', () => {
     console.log('SIGTERM received, shutting down gracefully...');
     process.exit(0);
@@ -235,7 +235,7 @@ if (process.env.VERCEL !== '1') {
 
 // Start the server only in non-Vercel environments
 // Vercel will use the exported app directly
-if (process.env.VERCEL !== '1') {
+if (!process.env.VERCEL) {
   startServer();
 }
 

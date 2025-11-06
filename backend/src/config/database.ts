@@ -8,13 +8,24 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+// Parse DATABASE_URL if provided (Supabase/Vercel style)
+// Otherwise use individual DB_* environment variables
+const databaseConfig = process.env.DATABASE_URL
+  ? {
+      connectionString: process.env.DATABASE_URL,
+      ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
+    }
+  : {
+      host: process.env.DB_HOST || 'localhost',
+      port: parseInt(process.env.DB_PORT || '5432'),
+      database: process.env.DB_NAME || 'momentum',
+      user: process.env.DB_USER || 'postgres',
+      password: process.env.DB_PASSWORD,
+    };
+
 // Create PostgreSQL connection pool
 export const pool = new Pool({
-  host: process.env.DB_HOST || 'localhost',
-  port: parseInt(process.env.DB_PORT || '5432'),
-  database: process.env.DB_NAME || 'momentum',
-  user: process.env.DB_USER || 'postgres',
-  password: process.env.DB_PASSWORD,
+  ...databaseConfig,
   max: 20, // Maximum number of clients in the pool
   idleTimeoutMillis: 30000, // Close idle clients after 30 seconds
   connectionTimeoutMillis: 2000, // Return an error if connection takes longer than 2 seconds
@@ -27,7 +38,10 @@ pool.on('connect', () => {
 
 pool.on('error', (err) => {
   console.error('❌ Unexpected database error:', err);
-  process.exit(-1);
+  // Don't exit in serverless environments - just log the error
+  if (process.env.VERCEL) {
+    console.error('Database error in Vercel - will retry on next request');
+  }
 });
 
 /**
