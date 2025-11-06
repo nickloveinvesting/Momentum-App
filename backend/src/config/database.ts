@@ -8,6 +8,13 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+// Debug logging for Vercel
+if (process.env.VERCEL) {
+  console.log('🔍 DATABASE_URL exists:', !!process.env.DATABASE_URL);
+  console.log('🔍 DATABASE_URL starts with postgresql:', process.env.DATABASE_URL?.startsWith('postgresql:'));
+  console.log('🔍 DB_HOST:', process.env.DB_HOST || 'not set');
+}
+
 // Parse DATABASE_URL if provided (Supabase/Vercel style)
 // Otherwise use individual DB_* environment variables
 const databaseConfig = process.env.DATABASE_URL
@@ -22,6 +29,8 @@ const databaseConfig = process.env.DATABASE_URL
       user: process.env.DB_USER || 'postgres',
       password: process.env.DB_PASSWORD,
     };
+
+console.log('🔍 Using connection config:', process.env.DATABASE_URL ? 'DATABASE_URL' : 'individual DB_* vars');
 
 // Create PostgreSQL connection pool
 export const pool = new Pool({
