@@ -4,9 +4,5 @@
   "devCommand": "npm run dev",
   "installCommand": "npm install",
   "framework": "nextjs",
-  "outputDirectory": ".next",
-  "env": {
-    "NEXT_PUBLIC_API_URL": "@momentum-api-url",
-    "NEXT_PUBLIC_ENV": "production"
-  }
+  "outputDirectory": ".next"
 }
