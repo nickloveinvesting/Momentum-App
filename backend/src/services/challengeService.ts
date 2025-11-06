@@ -122,24 +122,22 @@ export async function acceptChallenge(userId: string, challengeId: string): Prom
 
 /**
  * Complete a challenge
+ * MVP: Text-only evidence (20-1000 characters)
  */
 export async function completeChallenge(
   userId: string,
   challengeId: string,
-  evidenceType: EvidenceType,
-  evidenceUrl?: string,
-  reflectionText?: string
+  evidenceText: string
 ): Promise<DailyChallenge> {
   const result = await query<DailyChallengeRow>(
     `UPDATE daily_challenges
      SET status = 'completed',
          completed_at = NOW(),
-         evidence_type = $3,
-         evidence_url = $4,
-         reflection_text = $5
+         evidence_type = 'text',
+         reflection_text = $3
      WHERE id = $1 AND user_id = $2 AND status IN ('pending', 'accepted')
      RETURNING *`,
-    [challengeId, userId, evidenceType, evidenceUrl, reflectionText]
+    [challengeId, userId, evidenceText]
   );
 
   if (result.rows.length === 0) {
