@@ -1,6 +1,7 @@
 /**
  * Main Server File
  * Express application setup and configuration
+ * Updated: 2025-11-06 - Force rebuild
  */
 
 import express, { Application } from 'express';
