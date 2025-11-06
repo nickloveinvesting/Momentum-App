@@ -83,7 +83,7 @@ async function handleMissedChallengeForUser(userId: string): Promise<void> {
     await query(
       `UPDATE streaks
        SET freeze_available = false,
-           last_freeze_used = NOW()
+           freeze_used_this_week = true
        WHERE user_id = $1`,
       [userId]
     );

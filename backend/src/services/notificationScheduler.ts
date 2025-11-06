@@ -260,10 +260,10 @@ async function saveScheduledNotification(notification: NotificationPayload): Pro
  */
 async function getLastSessionTime(userId: string): Promise<Date | null> {
   const result = await query(
-    `SELECT last_login FROM users WHERE id = $1`,
+    `SELECT last_login_at FROM users WHERE id = $1`,
     [userId]
   );
-  return result.rows[0]?.last_login || null;
+  return result.rows[0]?.last_login_at || null;
 }
 
 /**
@@ -297,8 +297,9 @@ async function getChallengeStatus(userId: string): Promise<string> {
  */
 async function generateWeeklyReport(userId: string): Promise<any> {
   // Simplified version - full implementation would calculate zone expansion
+  const { randomUUID } = await import('crypto');
   return {
-    id: crypto.randomUUID(),
+    id: randomUUID(),
     totalExpansion: 15, // Placeholder
   };
 }

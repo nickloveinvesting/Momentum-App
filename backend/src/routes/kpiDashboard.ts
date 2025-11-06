@@ -196,14 +196,14 @@ async function calculateFunnel() {
   const landingPageViews = await query(`
     SELECT COUNT(*) as count
     FROM analytics_events
-    WHERE event_type = 'landing_page_view'
+    WHERE event = 'landing_page_view'
     AND created_at > NOW() - INTERVAL '7 days'
   `);
 
   const ctaClicks = await query(`
     SELECT COUNT(*) as count
     FROM analytics_events
-    WHERE event_type = 'cta_clicked'
+    WHERE event = 'cta_clicked'
     AND created_at > NOW() - INTERVAL '7 days'
   `);
 

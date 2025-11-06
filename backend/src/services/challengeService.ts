@@ -263,13 +263,22 @@ async function updateRangeProgress(userId: string, dailyChallengeId: string): Pr
   }
 
   const zone = challengeResult.rows[0].zone;
-  const radiusField = `${zone}_radius`;
+
+  // Validate zone to prevent SQL injection
+  const validZones = ['social', 'physical', 'professional', 'emotional'];
+  if (!validZones.includes(zone)) {
+    throw new AppError(`Invalid zone: ${zone}`, 400);
+  }
 
   // Increment the radius for the zone (expansion of 2.5 per completion)
+  // Using CASE statement to avoid SQL injection from string interpolation
   await query(
     `UPDATE range_progress
-     SET ${radiusField} = ${radiusField} + 2.5
+     SET social_radius = CASE WHEN $2 = 'social' THEN social_radius + 2.5 ELSE social_radius END,
+         physical_radius = CASE WHEN $2 = 'physical' THEN physical_radius + 2.5 ELSE physical_radius END,
+         professional_radius = CASE WHEN $2 = 'professional' THEN professional_radius + 2.5 ELSE professional_radius END,
+         emotional_radius = CASE WHEN $2 = 'emotional' THEN emotional_radius + 2.5 ELSE emotional_radius END
      WHERE user_id = $1 AND date = CURRENT_DATE`,
-    [userId]
+    [userId, zone]
   );
 }
