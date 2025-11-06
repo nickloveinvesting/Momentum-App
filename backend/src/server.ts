@@ -34,8 +34,8 @@ const app: Application = express();
 // MIDDLEWARE
 // ============================================================================
 
-// Security middleware
-app.use(helmet()); // Set security headers
+// Security middleware (disabled for Vercel serverless compatibility)
+// app.use(helmet()); // Set security headers
 
 // CORS configuration
 const corsOrigins = process.env.CORS_ORIGIN
@@ -140,13 +140,15 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
  */
 async function startServer() {
   try {
-    // Test database connection
-    console.log('🔌 Testing database connection...');
-    const dbConnected = await testConnection();
+    // Test database connection (skip in Vercel)
+    if (process.env.VERCEL !== '1') {
+      console.log('🔌 Testing database connection...');
+      const dbConnected = await testConnection();
 
-    if (!dbConnected) {
-      console.error('❌ Failed to connect to database');
-      process.exit(1);
+      if (!dbConnected) {
+        console.error('❌ Failed to connect to database');
+        process.exit(1);
+      }
     }
 
     // Start listening
@@ -220,8 +222,11 @@ process.on('unhandledRejection', (reason, promise) => {
   process.exit(1);
 });
 
-// Start the server
-startServer();
+// Start the server only in non-Vercel environments
+// Vercel will use the exported app directly
+if (process.env.VERCEL !== '1') {
+  startServer();
+}
 
-// Export app for testing
+// Export app for Vercel serverless
 export default app;
