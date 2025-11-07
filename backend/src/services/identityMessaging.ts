@@ -149,6 +149,7 @@ const MESSAGE_BANKS = {
       },
       {
         primary: "You keep choosing to show up socially. That's who you are.",
+        secondary: "Your actions define your identity.",
         tone: 'validating' as const,
       },
     ],
@@ -184,6 +185,7 @@ const MESSAGE_BANKS = {
       },
       {
         primary: "You chose physical challenge over comfort. Identity shift confirmed.",
+        secondary: "Every choice shapes who you're becoming.",
         tone: 'validating' as const,
       },
     ],
@@ -200,6 +202,7 @@ const MESSAGE_BANKS = {
       },
       {
         primary: "Physical challenges don't intimidate you like they used to.",
+        secondary: "You're proving your capacity grows with action.",
         tone: 'validating' as const,
       },
     ],
@@ -216,6 +219,7 @@ const MESSAGE_BANKS = {
       },
       {
         primary: "You honor your body by challenging it. This is your identity.",
+        secondary: "You've proven physical discomfort doesn't define your limits.",
         tone: 'celebrating' as const,
       },
     ],
@@ -235,6 +239,7 @@ const MESSAGE_BANKS = {
       },
       {
         primary: "Professional risk taken. Identity updated.",
+        secondary: "You're building evidence of your professional courage.",
         tone: 'validating' as const,
       },
     ],
@@ -251,6 +256,7 @@ const MESSAGE_BANKS = {
       },
       {
         primary: "Professional challenges don't silence you anymore.",
+        secondary: "You've found your voice and you keep using it.",
         tone: 'validating' as const,
       },
     ],
@@ -267,6 +273,7 @@ const MESSAGE_BANKS = {
       },
       {
         primary: "You speak. You propose. You challenge. This is who you are professionally.",
+        secondary: "Your track record shows consistent professional courage.",
         tone: 'celebrating' as const,
       },
     ],
@@ -286,6 +293,7 @@ const MESSAGE_BANKS = {
       },
       {
         primary: "You made space for hard emotions. Identity shift confirmed.",
+        secondary: "You're becoming someone who doesn't run from feelings.",
         tone: 'validating' as const,
       },
     ],
@@ -302,6 +310,7 @@ const MESSAGE_BANKS = {
       },
       {
         primary: "Emotional challenges don't overwhelm you like they used to.",
+        secondary: "You're building emotional resilience with each challenge.",
         tone: 'validating' as const,
       },
     ],
@@ -318,6 +327,7 @@ const MESSAGE_BANKS = {
       },
       {
         primary: "You feel. You process. You grow. This is your identity now.",
+        secondary: "You've mastered the art of emotional courage.",
         tone: 'celebrating' as const,
       },
     ],

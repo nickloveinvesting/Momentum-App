@@ -3,7 +3,7 @@
  * PostgreSQL connection pool and query helpers
  */
 
-import { Pool, QueryResult, PoolConfig } from 'pg';
+import { Pool, QueryResult, PoolConfig, QueryResultRow } from 'pg';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -56,7 +56,7 @@ pool.on('error', (err) => {
 /**
  * Execute a query with parameters
  */
-export async function query<T>(
+export async function query<T extends QueryResultRow = any>(
   text: string,
   params?: any[]
 ): Promise<QueryResult<T>> {
