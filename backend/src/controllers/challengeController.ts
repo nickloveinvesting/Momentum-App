@@ -4,7 +4,6 @@
  */
 
 import { Request, Response } from 'express';
-import { ChallengeCompletionRequest } from '@momentum/shared';
 import {
   getTodaysChallenge,
   acceptChallenge,

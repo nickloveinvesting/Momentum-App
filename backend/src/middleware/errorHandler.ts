@@ -29,7 +29,7 @@ export const errorHandler = (
   err: Error | AppError,
   req: Request,
   res: Response,
-  next: NextFunction
+  _next: NextFunction
 ): void => {
   // Default to 500 server error
   let statusCode = 500;
@@ -73,7 +73,7 @@ export const errorHandler = (
  */
 export const notFoundHandler = (
   req: Request,
-  res: Response,
+  _res: Response,
   next: NextFunction
 ): void => {
   const error = new AppError(`Route ${req.originalUrl} not found`, 404);

@@ -29,7 +29,7 @@ router.post('/events',
   ],
   validate,
   asyncHandler(async (req, res) => {
-    const { eventType, userId, anonymousId, properties, timestamp } = req.body;
+    const { eventType, userId, properties, timestamp } = req.body;
 
     // Store event in database
     await query(

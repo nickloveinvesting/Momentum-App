@@ -177,8 +177,8 @@ function getTargetZones(
 async function getCandidateChallenges(
   userId: string,
   targetDifficulty: string,
-  targetZones: { zone: string; weight: number }[],
-  history: UserChallengeHistory
+  _targetZones: { zone: string; weight: number }[],
+  _history: UserChallengeHistory
 ): Promise<ChallengeCandidate[]> {
   // Get all active challenges
   const result = await query(

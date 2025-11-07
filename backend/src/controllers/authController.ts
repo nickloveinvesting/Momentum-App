@@ -105,7 +105,7 @@ export const getCurrentUser = asyncHandler(async (req: Request, res: Response): 
  * Note: JWT is stateless, so logout is handled client-side by removing token
  * This endpoint exists for consistency and future server-side session management
  */
-export const logout = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+export const logout = asyncHandler(async (_req: Request, res: Response): Promise<void> => {
   res.status(200).json({
     message: 'Logged out successfully',
   });

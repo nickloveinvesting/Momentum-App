@@ -112,7 +112,7 @@ function calculateNotificationTime(
  */
 export async function scheduleCompletionNotification(
   userId: string,
-  challengeTitle: string,
+  _challengeTitle: string,
   currentStreak: number,
   identityMessage: string
 ): Promise<void> {
@@ -295,7 +295,7 @@ async function getChallengeStatus(userId: string): Promise<string> {
 /**
  * Helper: Generate weekly report
  */
-async function generateWeeklyReport(userId: string): Promise<any> {
+async function generateWeeklyReport(_userId: string): Promise<any> {
   // Simplified version - full implementation would calculate zone expansion
   const { randomUUID } = await import('crypto');
   return {
@@ -307,7 +307,7 @@ async function generateWeeklyReport(userId: string): Promise<any> {
 /**
  * Helper: Get next Sunday at 6 PM
  */
-function getNextSunday6PM(timezone: string): Date {
+function getNextSunday6PM(_timezone: string): Date {
   const now = new Date();
   const daysUntilSunday = (7 - now.getDay()) % 7 || 7;
   const nextSunday = new Date(now);
@@ -319,7 +319,7 @@ function getNextSunday6PM(timezone: string): Date {
 /**
  * Helper: Get today at 10 AM
  */
-function getTodayAt10AM(timezone: string): Date {
+function getTodayAt10AM(_timezone: string): Date {
   const today = new Date();
   today.setHours(10, 0, 0, 0);
   return today;

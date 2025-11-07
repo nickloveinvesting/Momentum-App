@@ -56,7 +56,7 @@ export async function getZoneIdentityFrame(zone: AvoidanceZone): Promise<string>
 export async function generateCompletionMessage(
   userId: string,
   zone: AvoidanceZone,
-  challengeTitle: string
+  _challengeTitle: string
 ): Promise<IdentityMessage> {
   // Get user's completion count and days active
   const stats = await query<any>(

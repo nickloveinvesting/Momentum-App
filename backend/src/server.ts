@@ -101,7 +101,7 @@ if (process.env.NODE_ENV === 'development') {
 // ============================================================================
 
 // Health check endpoint (with public rate limiter)
-app.get('/health', publicLimiter, (req, res) => {
+app.get('/health', publicLimiter, (_req, res) => {
   res.status(200).json({
     status: 'healthy',
     timestamp: new Date().toISOString(),
@@ -117,7 +117,7 @@ app.use('/api/progress', progressRoutes);
 app.use('/api/journal', journalRoutes);
 
 // Welcome route (with public rate limiter)
-app.get('/', publicLimiter, (req, res) => {
+app.get('/', publicLimiter, (_req, res) => {
   res.json({
     message: 'Welcome to Momentum API',
     version: '1.0.0',

@@ -50,7 +50,7 @@ export async function recordPreSuds(
  */
 export async function recordPostSuds(
   dailyChallengeId: string,
-  userId: string,
+  _userId: string,
   sudsRating: number
 ): Promise<number> {
   if (sudsRating < 0 || sudsRating > 100) {

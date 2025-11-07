@@ -3,15 +3,15 @@
  * JSON Web Token settings and utilities
  */
 
-import jwt from 'jsonwebtoken';
+import jwt, { SignOptions } from 'jsonwebtoken';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
-export const JWT_SECRET =
+export const JWT_SECRET: string =
   process.env.JWT_SECRET || 'your-secret-key-change-in-production';
-export const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
-export const JWT_REFRESH_EXPIRES_IN =
+export const JWT_EXPIRES_IN: string = process.env.JWT_EXPIRES_IN || '7d';
+export const JWT_REFRESH_EXPIRES_IN: string =
   process.env.JWT_REFRESH_EXPIRES_IN || '30d';
 
 export interface JwtPayload {
@@ -24,8 +24,8 @@ export interface JwtPayload {
  */
 export function generateToken(payload: JwtPayload): string {
   return jwt.sign(payload, JWT_SECRET, {
-    expiresIn: JWT_EXPIRES_IN,
-  });
+    expiresIn: JWT_EXPIRES_IN as any,
+  } as SignOptions);
 }
 
 /**
@@ -44,6 +44,6 @@ export function verifyToken(token: string): JwtPayload {
  */
 export function generateRefreshToken(payload: JwtPayload): string {
   return jwt.sign(payload, JWT_SECRET, {
-    expiresIn: JWT_REFRESH_EXPIRES_IN,
-  });
+    expiresIn: JWT_REFRESH_EXPIRES_IN as any,
+  } as SignOptions);
 }

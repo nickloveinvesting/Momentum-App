@@ -20,11 +20,24 @@ import { asyncHandler } from '../middleware/errorHandler';
 
 const router = Router();
 
+// Type definitions for query results
+interface RateResult {
+  rate: number;
+}
+
+interface CountResult {
+  count: string | number;
+}
+
+interface AvgStreakResult {
+  avg_streak: number;
+}
+
 /**
  * GET /api/kpi/overview
  * Core metrics for product-market fit validation
  */
-router.get('/overview', authenticate, asyncHandler(async (req, res) => {
+router.get('/overview', authenticate, asyncHandler(async (_req, res) => {
   const kpis = await calculateCoreKPIs();
   res.json(kpis);
 }));
@@ -33,7 +46,7 @@ router.get('/overview', authenticate, asyncHandler(async (req, res) => {
  * GET /api/kpi/retention-curve
  * Daily retention curve data for visualization
  */
-router.get('/retention-curve', authenticate, asyncHandler(async (req, res) => {
+router.get('/retention-curve', authenticate, asyncHandler(async (_req, res) => {
   const curve = await calculateRetentionCurve();
   res.json(curve);
 }));
@@ -42,7 +55,7 @@ router.get('/retention-curve', authenticate, asyncHandler(async (req, res) => {
  * GET /api/kpi/funnel
  * Conversion funnel metrics
  */
-router.get('/funnel', authenticate, asyncHandler(async (req, res) => {
+router.get('/funnel', authenticate, asyncHandler(async (_req, res) => {
   const funnel = await calculateFunnel();
   res.json(funnel);
 }));
@@ -52,7 +65,7 @@ router.get('/funnel', authenticate, asyncHandler(async (req, res) => {
  */
 async function calculateCoreKPIs() {
   // Day 1 Retention
-  const day1Retention = await query(`
+  const day1Retention = await query<RateResult>(`
     SELECT
       COUNT(DISTINCT CASE WHEN days_active >= 1 THEN user_id END)::float /
       NULLIF(COUNT(DISTINCT user_id), 0) * 100 as rate
@@ -68,7 +81,7 @@ async function calculateCoreKPIs() {
   `);
 
   // Day 7 Retention
-  const day7Retention = await query(`
+  const day7Retention = await query<RateResult>(`
     SELECT
       COUNT(DISTINCT CASE WHEN days_active >= 7 THEN user_id END)::float /
       NULLIF(COUNT(DISTINCT CASE WHEN EXTRACT(DAY FROM NOW() - created_at) >= 7 THEN user_id END), 0) * 100 as rate
@@ -88,7 +101,7 @@ async function calculateCoreKPIs() {
   `);
 
   // Day 30 Retention
-  const day30Retention = await query(`
+  const day30Retention = await query<RateResult>(`
     SELECT
       COUNT(DISTINCT CASE WHEN days_active >= 30 THEN user_id END)::float /
       NULLIF(COUNT(DISTINCT CASE WHEN EXTRACT(DAY FROM NOW() - created_at) >= 30 THEN user_id END), 0) * 100 as rate
@@ -108,7 +121,7 @@ async function calculateCoreKPIs() {
   `);
 
   // Challenge Completion Rate
-  const completionRate = await query(`
+  const completionRate = await query<RateResult>(`
     SELECT
       COUNT(*) FILTER (WHERE status = 'completed')::float /
       NULLIF(COUNT(*), 0) * 100 as rate
@@ -117,14 +130,14 @@ async function calculateCoreKPIs() {
   `);
 
   // Average Streak
-  const avgStreak = await query(`
+  const avgStreak = await query<AvgStreakResult>(`
     SELECT AVG(current_streak) as avg_streak
     FROM streaks
     WHERE current_streak > 0
   `);
 
   // Weekly Active Users (WAU) - North Star Metric
-  const wau = await query(`
+  const wau = await query<CountResult>(`
     SELECT COUNT(DISTINCT user_id) as count
     FROM daily_challenges
     WHERE status = 'completed'
@@ -132,7 +145,7 @@ async function calculateCoreKPIs() {
   `);
 
   // Total Users
-  const totalUsers = await query(`
+  const totalUsers = await query<CountResult>(`
     SELECT COUNT(*) as count FROM users
     WHERE created_at > NOW() - INTERVAL '30 days'
   `);
@@ -146,10 +159,10 @@ async function calculateCoreKPIs() {
     engagement: {
       completionRate: Math.round((completionRate.rows[0]?.rate || 0) * 10) / 10,
       avgStreak: Math.round((avgStreak.rows[0]?.avg_streak || 0) * 10) / 10,
-      weeklyActiveUsers: parseInt(wau.rows[0]?.count || '0'),
+      weeklyActiveUsers: parseInt(String(wau.rows[0]?.count || '0')),
     },
     users: {
-      total: parseInt(totalUsers.rows[0]?.count || '0'),
+      total: parseInt(String(totalUsers.rows[0]?.count || '0')),
       newThisWeek: 0, // Simplified for now
     },
     benchmarks: {

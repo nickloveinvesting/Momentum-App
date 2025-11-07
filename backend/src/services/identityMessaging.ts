@@ -26,12 +26,11 @@ export interface IdentityMessage {
 export function generateIdentityMessage(
   zone: 'social' | 'physical' | 'professional' | 'emotional',
   completionCount: number,
-  currentStreak: number
+  _currentStreak: number
 ): IdentityMessage {
   // Determine user stage
   const isEarly = completionCount <= 4;
   const isEstablishing = completionCount >= 5 && completionCount <= 10;
-  const isConsistent = completionCount > 10;
 
   // Select message bank based on zone
   const messageBank = MESSAGE_BANKS[zone];
@@ -79,11 +78,13 @@ export function generateStreakMessage(streak: number): IdentityMessage {
   } else if (streak % 10 === 0) {
     return {
       primary: `${streak} days of facing discomfort. You're rewriting your story.`,
+      secondary: "Every day is evidence of who you're becoming.",
       tone: 'validating',
     };
   } else {
     return {
       primary: `Day ${streak}. Another proof point that you choose growth.`,
+      secondary: "Consistency builds identity.",
       tone: 'encouraging',
     };
   }
@@ -149,6 +150,7 @@ const MESSAGE_BANKS = {
       },
       {
         primary: "You keep choosing to show up socially. That's who you are.",
+        secondary: "Your actions prove your identity.",
         tone: 'validating' as const,
       },
     ],
@@ -165,6 +167,7 @@ const MESSAGE_BANKS = {
       },
       {
         primary: "You initiate. You engage. You show up. This is your identity now.",
+        secondary: "The evidence is undeniable.",
         tone: 'celebrating' as const,
       },
     ],
@@ -184,6 +187,7 @@ const MESSAGE_BANKS = {
       },
       {
         primary: "You chose physical challenge over comfort. Identity shift confirmed.",
+        secondary: "Your actions define who you're becoming.",
         tone: 'validating' as const,
       },
     ],
@@ -200,6 +204,7 @@ const MESSAGE_BANKS = {
       },
       {
         primary: "Physical challenges don't intimidate you like they used to.",
+        secondary: "You're building physical confidence through action.",
         tone: 'validating' as const,
       },
     ],
@@ -216,6 +221,7 @@ const MESSAGE_BANKS = {
       },
       {
         primary: "You honor your body by challenging it. This is your identity.",
+        secondary: "Your commitment to physical growth is clear.",
         tone: 'celebrating' as const,
       },
     ],
@@ -235,6 +241,7 @@ const MESSAGE_BANKS = {
       },
       {
         primary: "Professional risk taken. Identity updated.",
+        secondary: "Each action builds your professional identity.",
         tone: 'validating' as const,
       },
     ],
@@ -251,6 +258,7 @@ const MESSAGE_BANKS = {
       },
       {
         primary: "Professional challenges don't silence you anymore.",
+        secondary: "You're developing a voice that matters.",
         tone: 'validating' as const,
       },
     ],
@@ -267,6 +275,7 @@ const MESSAGE_BANKS = {
       },
       {
         primary: "You speak. You propose. You challenge. This is who you are professionally.",
+        secondary: "Your professional identity is established.",
         tone: 'celebrating' as const,
       },
     ],
@@ -286,6 +295,7 @@ const MESSAGE_BANKS = {
       },
       {
         primary: "You made space for hard emotions. Identity shift confirmed.",
+        secondary: "Emotional courage is becoming your default.",
         tone: 'validating' as const,
       },
     ],
@@ -302,6 +312,7 @@ const MESSAGE_BANKS = {
       },
       {
         primary: "Emotional challenges don't overwhelm you like they used to.",
+        secondary: "You're building emotional resilience through practice.",
         tone: 'validating' as const,
       },
     ],
@@ -318,6 +329,7 @@ const MESSAGE_BANKS = {
       },
       {
         primary: "You feel. You process. You grow. This is your identity now.",
+        secondary: "Emotional strength is yours.",
         tone: 'celebrating' as const,
       },
     ],
