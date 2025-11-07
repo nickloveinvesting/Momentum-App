@@ -18,7 +18,6 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { DESIGN_TOKENS } from '@momentum/shared/design-tokens';
 
 interface Challenge {
   id: string;

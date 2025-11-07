@@ -157,7 +157,7 @@ export default function MissedChallengeBanner({
           {offerEasierChallenge && consecutiveMisses >= 2 && (
             <div className="p-3 bg-white/50 rounded border border-gray-200 mb-4">
               <p className="text-sm text-gray-700">
-                💡 <strong>Tip:</strong> We've adjusted today's challenge to be a bit easier.
+                💡 <strong>Tip:</strong> We&apos;ve adjusted today&apos;s challenge to be a bit easier.
                 Getting back in is more important than intensity.
               </p>
             </div>
@@ -170,7 +170,7 @@ export default function MissedChallengeBanner({
               variant="primary"
               className="sm:w-auto"
             >
-              {consecutiveMisses === 1 ? 'Start Today\'s Challenge' : 'Restart Today'}
+              {consecutiveMisses === 1 ? 'Start Today&apos;s Challenge' : 'Restart Today'}
             </Button>
 
             {onDismiss && (

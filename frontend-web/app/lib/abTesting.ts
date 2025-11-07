@@ -21,7 +21,7 @@ export interface ABTest {
 export interface ABVariant {
   id: string;
   label: string;
-  value: any;
+  value: string;
 }
 
 export interface ABTestAssignment {
@@ -132,8 +132,8 @@ function hashString(str: string): number {
 /**
  * Get all active variants for a user
  */
-export function getAllVariants(userId: string): Record<string, any> {
-  const variants: Record<string, any> = {};
+export function getAllVariants(userId: string): Record<string, string> {
+  const variants: Record<string, string> = {};
 
   Object.entries(AB_TESTS).forEach(([key, test]) => {
     if (test.enabled) {
@@ -174,7 +174,7 @@ export async function trackAssignment(
 export async function trackConversion(
   userId: string,
   eventType: string,
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 ): Promise<void> {
   await fetch('/api/analytics/conversion', {
     method: 'POST',
