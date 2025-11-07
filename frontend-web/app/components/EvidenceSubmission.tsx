@@ -18,8 +18,7 @@ import Button from './Button';
 
 interface EvidenceSubmissionProps {
   challengeId: string;
-  challengeTitle?: string;
-  onSubmit: (evidenceText: string) => Promise<void>;
+  onSubmit: (evidenceText?: string) => Promise<void>;
   onSkip?: () => void;
   className?: string;
 }
@@ -30,7 +29,6 @@ const LOCAL_STORAGE_KEY_PREFIX = 'momentum_evidence_draft_';
 
 export default function EvidenceSubmission({
   challengeId,
-  challengeTitle,
   onSubmit,
   onSkip,
   className = '',
