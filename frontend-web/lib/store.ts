@@ -173,7 +173,7 @@ export const useMomentumStore = create<MomentumStore>((set) => ({
     })),
 
   logout: () =>
-    set((state) => ({
+    set(() => ({
       auth: initialAuthState,
       challenge: initialChallengeState,
       progress: initialProgressState,

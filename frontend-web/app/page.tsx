@@ -118,7 +118,7 @@ export default function LandingPage() {
               </h3>
               <p className="text-gray-600">
                 Visualize your comfort zone expansion with the Range Map. Each
-                completion is evidence of who you're becoming.
+                completion is evidence of who you&apos;re becoming.
               </p>
             </div>
           </div>
@@ -129,13 +129,13 @@ export default function LandingPage() {
       <section className="container-safe py-20 bg-gradient-to-r from-primary-900 to-primary-700 text-white">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl md:text-5xl font-bold mb-8">
-            "Action creates clarity. Small wins build identity."
+            &quot;Action creates clarity. Small wins build identity.&quot;
           </h2>
           <p className="text-xl md:text-2xl text-primary-100 mb-8">
-            You don't think your way out of avoidance. You act your way out.
+            You don&apos;t think your way out of avoidance. You act your way out.
           </p>
           <p className="text-lg text-primary-200 max-w-2xl mx-auto">
-            Momentum isn't about motivation or willpower. It's about systematic
+            Momentum isn&apos;t about motivation or willpower. It&apos;s about systematic
             expansion of your comfort zone through evidence-based challenges
             that shift your identity.
           </p>

@@ -11,6 +11,7 @@ import {
 } from '../controllers/journalController';
 import { authenticate } from '../middleware/auth';
 import { validateJournalEntry, validate } from '../middleware/validator';
+import { apiLimiter, submitLimiter } from '../middleware/rateLimiter';
 
 const router = Router();
 
@@ -21,18 +22,18 @@ router.use(authenticate);
  * GET /api/journal/entries
  * Get all journal entries for the authenticated user
  */
-router.get('/entries', getJournalEntries);
+router.get('/entries', apiLimiter, getJournalEntries);
 
 /**
  * GET /api/journal/entry/:id
  * Get a specific journal entry by ID
  */
-router.get('/entry/:id', getJournalEntry);
+router.get('/entry/:id', apiLimiter, getJournalEntry);
 
 /**
  * POST /api/journal/entry
  * Create a new journal entry
  */
-router.post('/entry', validateJournalEntry, validate, createJournalEntry);
+router.post('/entry', submitLimiter, validateJournalEntry, validate, createJournalEntry);
 
 export default router;

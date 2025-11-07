@@ -13,7 +13,7 @@ import {
 } from '../controllers/challengeController';
 import { authenticate } from '../middleware/auth';
 import { validateChallengeCompletion, validate } from '../middleware/validator';
-import { challengeLimiter } from '../middleware/rateLimiter';
+import { apiLimiter, submitLimiter } from '../middleware/rateLimiter';
 
 const router = Router();
 
@@ -24,19 +24,19 @@ router.use(authenticate);
  * GET /api/challenges/today
  * Get today's challenge for the authenticated user
  */
-router.get('/today', getTodaysChallengeHandler);
+router.get('/today', apiLimiter, getTodaysChallengeHandler);
 
 /**
  * GET /api/challenges/history
  * Get user's challenge history
  */
-router.get('/history', getChallengeHistoryHandler);
+router.get('/history', apiLimiter, getChallengeHistoryHandler);
 
 /**
  * POST /api/challenges/:id/accept
  * Accept a challenge
  */
-router.post('/:id/accept', acceptChallengeHandler);
+router.post('/:id/accept', submitLimiter, acceptChallengeHandler);
 
 /**
  * POST /api/challenges/:id/complete
@@ -44,7 +44,7 @@ router.post('/:id/accept', acceptChallengeHandler);
  */
 router.post(
   '/:id/complete',
-  challengeLimiter,
+  submitLimiter,
   validateChallengeCompletion,
   validate,
   completeChallengeHandler
@@ -54,6 +54,6 @@ router.post(
  * POST /api/challenges/:id/skip
  * Skip today's challenge
  */
-router.post('/:id/skip', skipChallengeHandler);
+router.post('/:id/skip', submitLimiter, skipChallengeHandler);
 
 export default router;

@@ -29,22 +29,49 @@ This is a monorepo containing:
 
 ## 🚀 Quick Start
 
-```bash
-# Install dependencies
-npm install
+### Prerequisites
+- Node.js 18+
+- npm 9+
+- PostgreSQL 14+ (for local development)
+- Supabase project (for production)
 
-# Set up environment variables
-cp .env.example .env
+### Local Development
 
-# Run database migrations
-npm run db:migrate
+1. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-# Start development servers
-npm run dev
+2. **Set up environment variables**
+   ```bash
+   cp backend/.env.example backend/.env
+   cp frontend-web/.env.example frontend-web/.env.local
+   ```
 
-# Run tests
-npm test
-```
+   Edit `backend/.env` and `frontend-web/.env.local` with your local settings.
+
+3. **For local database (optional - only needed if testing locally)**
+   ```bash
+   createdb momentum
+   psql momentum < database/schema.sql
+   ```
+
+4. **Run development servers**
+   ```bash
+   npm run dev
+   ```
+   This starts:
+   - Backend on http://localhost:3000
+   - Frontend on http://localhost:3001
+
+5. **Run tests**
+   ```bash
+   npm test
+   ```
+
+### Production Deployment
+
+See [frontend-web/DEPLOYMENT.md](./frontend-web/DEPLOYMENT.md) for Vercel & Supabase setup instructions.
 
 ## 📱 Features
 
