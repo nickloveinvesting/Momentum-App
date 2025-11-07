@@ -122,22 +122,23 @@ export async function acceptChallenge(userId: string, challengeId: string): Prom
 
 /**
  * Complete a challenge
- * MVP: Text-only evidence (20-1000 characters)
+ * MVP: Text-only evidence (OPTIONAL, 20-1000 characters when provided)
  */
 export async function completeChallenge(
   userId: string,
   challengeId: string,
-  evidenceText: string
+  evidenceText?: string
 ): Promise<DailyChallenge> {
+  // Evidence is optional per research (optional = adherence, required = compliance)
   const result = await query<DailyChallengeRow>(
     `UPDATE daily_challenges
      SET status = 'completed',
          completed_at = NOW(),
-         evidence_type = 'text',
+         evidence_type = CASE WHEN $3 IS NOT NULL THEN 'text' ELSE NULL END,
          reflection_text = $3
      WHERE id = $1 AND user_id = $2 AND status IN ('pending', 'accepted')
      RETURNING *`,
-    [challengeId, userId, evidenceText]
+    [challengeId, userId, evidenceText || null]
   );
 
   if (result.rows.length === 0) {
@@ -149,6 +150,40 @@ export async function completeChallenge(
 
   // Update range progress
   await updateRangeProgress(userId, challengeId);
+
+  // Check and award flex day (every 7 consecutive completions)
+  const { checkAndAwardFlexDay } = await import('./flexDaysService');
+  const flexDayAwarded = await checkAndAwardFlexDay(userId);
+
+  if (flexDayAwarded) {
+    // Track event for analytics
+    await query(
+      `INSERT INTO analytics_events (user_id, event, properties)
+       VALUES ($1, 'flex_day_earned', $2)`,
+      [userId, JSON.stringify({ timestamp: new Date() })]
+    );
+  }
+
+  // Get challenge zone for difficulty and identity messaging
+  const zoneResult = await query<{ zone: string }>(
+    `SELECT c.zone FROM daily_challenges dc
+     JOIN challenges c ON dc.challenge_id = c.id
+     WHERE dc.id = $1`,
+    [challengeId]
+  );
+
+  if (zoneResult.rows.length > 0) {
+    const zone = zoneResult.rows[0].zone as any;
+
+    // Update difficulty calibration
+    const { updateDifficultyAfterAttempt } = await import('./difficultyCalibrationService');
+    await updateDifficultyAfterAttempt(userId, zone, true);
+
+    // Generate and store identity message
+    const { generateCompletionMessage, storeIdentityMessage } = await import('./identityMessagingService');
+    const identityMessage = await generateCompletionMessage(userId, zone, 'Challenge');
+    await storeIdentityMessage(userId, challengeId, identityMessage);
+  }
 
   return rowToDailyChallenge(result.rows[0]);
 }
@@ -169,8 +204,51 @@ export async function skipChallenge(userId: string, challengeId: string): Promis
     throw new AppError('Challenge not found or cannot be skipped', 404);
   }
 
-  // Reset streak if no freeze available
-  await checkAndResetStreak(userId);
+  // Try to use flex day, otherwise reset streak
+  const { useFlexDayIfAvailable } = await import('./flexDaysService');
+  const flexDayUsed = await useFlexDayIfAvailable(userId);
+
+  if (flexDayUsed) {
+    // Track flex day used
+    const streakResult = await query<{ current_streak: number }>(
+      'SELECT current_streak FROM streaks WHERE user_id = $1',
+      [userId]
+    );
+
+    const streakPreserved = streakResult.rows[0]?.current_streak || 0;
+
+    await query(
+      `INSERT INTO analytics_events (user_id, event, properties)
+       VALUES ($1, 'flex_day_used', $2)`,
+      [userId, JSON.stringify({ streakPreserved, timestamp: new Date() })]
+    );
+  } else {
+    // No flex day available, reset streak
+    await query(
+      `UPDATE streaks
+       SET current_streak = 0,
+           consecutive_completions_for_flex = 0,
+           updated_at = NOW()
+       WHERE user_id = $1`,
+      [userId]
+    );
+  }
+
+  // Get challenge zone for difficulty tracking
+  const zoneResult = await query<{ zone: string }>(
+    `SELECT c.zone FROM daily_challenges dc
+     JOIN challenges c ON dc.challenge_id = c.id
+     WHERE dc.id = $1`,
+    [challengeId]
+  );
+
+  if (zoneResult.rows.length > 0) {
+    const zone = zoneResult.rows[0].zone as any;
+
+    // Update difficulty calibration (mark as unsuccessful attempt)
+    const { updateDifficultyAfterAttempt } = await import('./difficultyCalibrationService');
+    await updateDifficultyAfterAttempt(userId, zone, false);
+  }
 
   return rowToDailyChallenge(result.rows[0]);
 }
@@ -207,42 +285,10 @@ async function updateStreak(userId: string): Promise<void> {
      SET current_streak = current_streak + 1,
          longest_streak = GREATEST(longest_streak, current_streak + 1),
          last_completed_date = CURRENT_DATE,
-         freeze_available = (current_streak + 1) % 7 = 0,
          updated_at = NOW()
      WHERE user_id = $1`,
     [userId]
   );
-}
-
-/**
- * Check and reset streak if needed
- */
-async function checkAndResetStreak(userId: string): Promise<void> {
-  const result = await query<{ freeze_available: boolean }>(
-    'SELECT freeze_available FROM streaks WHERE user_id = $1',
-    [userId]
-  );
-
-  if (result.rows.length > 0 && result.rows[0].freeze_available) {
-    // Use freeze
-    await query(
-      `UPDATE streaks
-       SET freeze_available = false,
-           freeze_used_this_week = true,
-           updated_at = NOW()
-       WHERE user_id = $1`,
-      [userId]
-    );
-  } else {
-    // Reset streak
-    await query(
-      `UPDATE streaks
-       SET current_streak = 0,
-           updated_at = NOW()
-       WHERE user_id = $1`,
-      [userId]
-    );
-  }
 }
 
 /**

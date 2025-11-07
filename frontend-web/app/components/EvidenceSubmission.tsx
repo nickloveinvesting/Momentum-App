@@ -18,8 +18,7 @@ import Button from './Button';
 
 interface EvidenceSubmissionProps {
   challengeId: string;
-  challengeTitle?: string;
-  onSubmit: (evidenceText: string) => Promise<void>;
+  onSubmit: (evidenceText?: string) => Promise<void>;
   onSkip?: () => void;
   className?: string;
 }
@@ -30,7 +29,6 @@ const LOCAL_STORAGE_KEY_PREFIX = 'momentum_evidence_draft_';
 
 export default function EvidenceSubmission({
   challengeId,
-  challengeTitle,
   onSubmit,
   onSkip,
   className = '',
@@ -72,11 +70,15 @@ export default function EvidenceSubmission({
   };
 
   const handleSubmit = async () => {
-    if (!isValid) {
-      setError(charCount < MIN_CHARS
-        ? `Please provide more detail (at least ${MIN_CHARS} characters)`
-        : `Please keep it under ${MAX_CHARS} characters`
-      );
+    // Evidence is OPTIONAL per research - allow submission even if empty
+    // But encourage 20+ chars if user has started typing
+    if (charCount > 0 && charCount < MIN_CHARS) {
+      setError(`Please provide more detail (at least ${MIN_CHARS} characters) or skip if you prefer`);
+      return;
+    }
+
+    if (isOverLimit) {
+      setError(`Please keep it under ${MAX_CHARS} characters`);
       return;
     }
 
@@ -84,7 +86,9 @@ export default function EvidenceSubmission({
     setError('');
 
     try {
-      await onSubmit(evidenceText.trim());
+      // Send evidence text only if provided (20+ chars)
+      const evidenceToSubmit = (charCount >= MIN_CHARS) ? evidenceText.trim() : undefined;
+      await onSubmit(evidenceToSubmit);
       // Clear draft on successful submission
       localStorage.removeItem(LOCAL_STORAGE_KEY_PREFIX + challengeId);
     } catch (err: unknown) {
@@ -119,10 +123,10 @@ export default function EvidenceSubmission({
       {/* Header */}
       <div>
         <h2 className="text-2xl font-semibold text-gray-900 mb-2">
-          Proof of Expansion
+          Proof of Expansion (Optional)
         </h2>
         <p className="text-gray-600">
-          What happened? How did you approach{challengeTitle ? ` "${challengeTitle}"` : ' this challenge'}?
+          What did you do and how did it go? Evidence helps habits stick, but it&apos;s not required.
         </p>
       </div>
 
@@ -183,22 +187,22 @@ export default function EvidenceSubmission({
       <div className="flex flex-col sm:flex-row gap-3">
         <Button
           onClick={handleSubmit}
-          disabled={!isValid || isSubmitting}
+          disabled={isSubmitting}
           isLoading={isSubmitting}
           variant="primary"
           className="flex-1 min-h-[44px]"
         >
-          {isSubmitting ? 'Submitting...' : 'Submit Proof'}
+          {isSubmitting ? 'Submitting...' : (charCount >= MIN_CHARS ? 'Submit with Evidence' : 'Complete Challenge')}
         </Button>
 
-        {onSkip && (
+        {onSkip && charCount >= MIN_CHARS && (
           <Button
             onClick={handleSkip}
             variant="secondary"
             disabled={isSubmitting}
             className="sm:w-auto min-h-[44px]"
           >
-            {showSkipConfirm ? 'Confirm Skip' : 'Add Later'}
+            Save & Add Later
           </Button>
         )}
       </div>
