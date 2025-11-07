@@ -61,3 +61,4 @@ infrastructure/.terraform/
 .cache/
 tmp/
 temp/
+.credentials.local
