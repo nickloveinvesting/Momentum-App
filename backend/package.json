@@ -5,7 +5,10 @@
   "main": "dist/server.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
+    "postinstall": "cd ../shared && npm install && npm run build",
+    "prebuild": "cd ../shared && npm install && npm run build",
     "build": "tsc",
+    "vercel-build": "npm run build",
     "start": "node dist/server.js",
     "test": "jest",
     "test:watch": "jest --watch",
