@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "build": "tsc",
+    "prebuild": "cd ../shared && npm install && npm run build",
+    "vercel-build": "npm run build",
     "start": "node dist/server.js",
     "test": "jest",
     "test:watch": "jest --watch",

@@ -230,8 +230,11 @@ process.on('unhandledRejection', (reason, promise) => {
   process.exit(1);
 });
 
-// Start the server
-startServer();
+// Only start the server if not running in Vercel serverless environment
+// In Vercel, the app is exported and run as a serverless function
+if (process.env.VERCEL !== '1' && require.main === module) {
+  startServer();
+}
 
-// Export app for testing
+// Export app for Vercel serverless and testing
 export default app;
