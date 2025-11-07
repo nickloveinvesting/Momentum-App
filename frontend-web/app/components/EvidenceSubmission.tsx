@@ -15,7 +15,6 @@
 
 import React, { useState, useEffect } from 'react';
 import Button from './Button';
-import { DESIGN_TOKENS } from '@momentum/shared/design-tokens';
 
 interface EvidenceSubmissionProps {
   challengeId: string;
@@ -88,8 +87,9 @@ export default function EvidenceSubmission({
       await onSubmit(evidenceText.trim());
       // Clear draft on successful submission
       localStorage.removeItem(LOCAL_STORAGE_KEY_PREFIX + challengeId);
-    } catch (err: any) {
-      setError(err.message || 'Failed to submit evidence. Please try again.');
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to submit evidence. Please try again.';
+      setError(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -206,8 +206,8 @@ export default function EvidenceSubmission({
       {/* Skip Confirmation Message */}
       {showSkipConfirm && (
         <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-800 text-sm">
-          <p className="font-medium">You've written {charCount} characters.</p>
-          <p className="mt-1">Evidence boosts retention by 2x. Click "Confirm Skip" to continue without it.</p>
+          <p className="font-medium">You&apos;ve written {charCount} characters.</p>
+          <p className="mt-1">Evidence boosts retention by 2x. Click &quot;Confirm Skip&quot; to continue without it.</p>
         </div>
       )}
 

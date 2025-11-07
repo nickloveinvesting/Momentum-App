@@ -11,7 +11,7 @@ export interface AnalyticsEvent {
   eventType: string;
   userId?: string;
   anonymousId?: string;
-  properties?: Record<string, any>;
+  properties?: Record<string, unknown>;
   timestamp: number;
 }
 
@@ -84,7 +84,7 @@ export function trackPageView(pageName: string, userId?: string): void {
  */
 export const analytics = {
   // User lifecycle
-  userRegistered: (userId: string, properties?: Record<string, any>) =>
+  userRegistered: (userId: string, properties?: Record<string, unknown>) =>
     trackEvent({
       eventType: EVENT_TYPES.USER_REGISTERED,
       userId,
@@ -145,7 +145,7 @@ export const analytics = {
     }),
 
   // Landing page
-  landingPageView: (anonymousId: string, variant: Record<string, any>) =>
+  landingPageView: (anonymousId: string, variant: Record<string, unknown>) =>
     trackEvent({
       eventType: EVENT_TYPES.LANDING_PAGE_VIEW,
       anonymousId,
