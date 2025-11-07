@@ -46,13 +46,41 @@ app.use(Sentry.Handlers.tracingHandler());
 // Security middleware
 app.use(helmet()); // Set security headers
 
-// CORS configuration
-app.use(
-  cors({
-    origin: process.env.CORS_ORIGIN || '*',
-    credentials: true,
-  })
-);
+// CORS configuration - Allow Vercel deployments and localhost
+const corsOptions = {
+  origin: function (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
+    // Allow requests with no origin (mobile apps, curl, etc.)
+    if (!origin) {
+      return callback(null, true);
+    }
+
+    // Parse explicit CORS_ORIGIN if set (comma-separated list)
+    const explicitOrigins = process.env.CORS_ORIGIN 
+      ? process.env.CORS_ORIGIN.split(',').map(o => o.trim())
+      : [];
+
+    // Check if origin is explicitly allowed
+    if (explicitOrigins.includes(origin) || explicitOrigins.includes('*')) {
+      return callback(null, true);
+    }
+
+    // Automatically allow all Vercel preview deployments
+    if (origin.endsWith('.vercel.app')) {
+      return callback(null, true);
+    }
+
+    // Allow localhost for development
+    if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
+      return callback(null, true);
+    }
+
+    // Reject other origins
+    callback(new Error('Not allowed by CORS'));
+  },
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
 
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' })); // Parse JSON bodies
