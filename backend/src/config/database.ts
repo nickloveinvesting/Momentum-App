@@ -3,22 +3,45 @@
  * PostgreSQL connection pool and query helpers
  */
 
-import { Pool, QueryResult } from 'pg';
+import { Pool, QueryResult, PoolConfig } from 'pg';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
+/**
+ * Get PostgreSQL pool configuration
+ * Prioritizes DATABASE_URL (Vercel/Supabase) over individual DB_* variables (local dev)
+ */
+const getPoolConfig = (): PoolConfig => {
+  const databaseUrl = process.env.DATABASE_URL;
+
+  if (databaseUrl) {
+    console.log('📡 Using DATABASE_URL connection (Vercel/Supabase)');
+    return {
+      connectionString: databaseUrl,
+      max: 20,
+      idleTimeoutMillis: 30000,
+      connectionTimeoutMillis: 2000,
+      ssl: { rejectUnauthorized: false }, // Supabase requirement
+    };
+  }
+
+  console.log('📡 Using individual DB_* environment variables (Local Dev)');
+  return {
+    host: process.env.DB_HOST || 'localhost',
+    port: parseInt(process.env.DB_PORT || '5432'),
+    database: process.env.DB_NAME || 'momentum',
+    user: process.env.DB_USER || 'postgres',
+    password: process.env.DB_PASSWORD,
+    max: 20, // Maximum number of clients in the pool
+    idleTimeoutMillis: 30000, // Close idle clients after 30 seconds
+    connectionTimeoutMillis: 2000, // Return an error if connection takes longer than 2 seconds
+    ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
+  };
+};
+
 // Create PostgreSQL connection pool
-export const pool = new Pool({
-  host: process.env.DB_HOST || 'localhost',
-  port: parseInt(process.env.DB_PORT || '5432'),
-  database: process.env.DB_NAME || 'momentum',
-  user: process.env.DB_USER || 'postgres',
-  password: process.env.DB_PASSWORD,
-  max: 20, // Maximum number of clients in the pool
-  idleTimeoutMillis: 30000, // Close idle clients after 30 seconds
-  connectionTimeoutMillis: 2000, // Return an error if connection takes longer than 2 seconds
-});
+export const pool = new Pool(getPoolConfig());
 
 // Test database connection
 pool.on('connect', () => {

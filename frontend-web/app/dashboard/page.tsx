@@ -9,17 +9,24 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { challengeAPI, progressAPI } from '@/lib/api';
 import { useMomentumStore } from '@/lib/store';
-import type { DailyChallenge, Challenge } from '@momentum/shared';
+import type { DailyChallenge, Challenge, Streak } from '@momentum/shared';
 import ChallengeCard from '../components/ChallengeCard';
 import StreakDisplay from '../components/StreakDisplay';
 import Button from '../components/Button';
+
+interface StatsData {
+  totalCompleted: number;
+  completionRate: number;
+  currentStreak: number;
+  longestStreak: number;
+}
 
 export default function DashboardPage() {
   const { auth, setTodayChallenge, setStreak, setStats } = useMomentumStore();
   const [todayChallenge, setTodayChallengeLocal] = useState<DailyChallenge | null>(null);
   const [challenge, setChallengeLocal] = useState<Challenge | null>(null);
-  const [streak, setStreakLocal] = useState<any>(null);
-  const [stats, setStatsLocal] = useState<any>(null);
+  const [streak, setStreakLocal] = useState<Streak | null>(null);
+  const [stats, setStatsLocal] = useState<StatsData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -51,6 +58,7 @@ export default function DashboardPage() {
     };
 
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (isLoading) {
@@ -86,7 +94,7 @@ export default function DashboardPage() {
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Left Column - Today's Challenge */}
           <div className="lg:col-span-2 space-y-6">
-            <h2 className="text-2xl font-bold text-gray-900">Today's Challenge</h2>
+            <h2 className="text-2xl font-bold text-gray-900">Today&apos;s Challenge</h2>
 
             {todayChallenge && challenge ? (
               <ChallengeCard dailyChallenge={todayChallenge} challenge={challenge} />
@@ -99,7 +107,7 @@ export default function DashboardPage() {
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-2">All Caught Up!</h3>
                 <p className="text-gray-600 mb-6">
-                  You've completed today's challenge. Come back tomorrow for your next one.
+                  You&apos;ve completed today&apos;s challenge. Come back tomorrow for your next one.
                 </p>
                 <Link href="/journal">
                   <Button variant="outline">View Your Journal</Button>

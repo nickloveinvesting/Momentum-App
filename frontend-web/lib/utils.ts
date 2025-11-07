@@ -295,7 +295,7 @@ export function removeFromStorage(key: string): void {
 /**
  * Build query string from object
  */
-export function buildQueryString(params: Record<string, any>): string {
+export function buildQueryString(params: Record<string, string | number | boolean | undefined | null>): string {
   const searchParams = new URLSearchParams();
 
   Object.entries(params).forEach(([key, value]) => {

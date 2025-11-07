@@ -11,10 +11,17 @@ import type { RangeMap as RangeMapType, Streak } from '@momentum/shared';
 import RangeMap from '../components/RangeMap';
 import StreakDisplay from '../components/StreakDisplay';
 
+interface StatsData {
+  totalCompleted: number;
+  completionRate: number;
+  currentStreak: number;
+  longestStreak: number;
+}
+
 export default function ProgressPage() {
   const [rangeMap, setRangeMap] = useState<RangeMapType | null>(null);
   const [streak, setStreak] = useState<Streak | null>(null);
-  const [stats, setStats] = useState<any>(null);
+  const [stats, setStats] = useState<StatsData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {

@@ -34,9 +34,10 @@ export default function LoginPage() {
       const response = await authAPI.login(data);
       setUser(response.user);
       router.push('/dashboard');
-    } catch (err: any) {
-      setError(err.message || 'Login failed');
-      setAuthError(err);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Login failed';
+      setError(errorMessage);
+      setAuthError(null);
     } finally {
       setIsLoading(false);
     }
@@ -99,7 +100,7 @@ export default function LoginPage() {
 
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
-              Don't have an account?{' '}
+              Don&apos;t have an account?{' '}
               <Link href="/register" className="text-primary-900 font-medium hover:text-primary-700">
                 Start Free Trial
               </Link>

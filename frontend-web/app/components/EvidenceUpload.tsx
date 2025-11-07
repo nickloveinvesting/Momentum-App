@@ -108,8 +108,9 @@ export default function EvidenceUpload({
         evidenceType as 'photo' | 'screenshot' | 'voice'
       );
       onUploadComplete(url);
-    } catch (error: any) {
-      onError?.(error.message || 'Upload failed. Please try again.');
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Upload failed. Please try again.';
+      onError?.(errorMessage);
     } finally {
       setIsUploading(false);
     }

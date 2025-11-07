@@ -23,9 +23,25 @@ import type {
 } from '@momentum/shared';
 
 // API Configuration
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+function getApiBaseUrl(): string {
+  // For production (Vercel): MUST be explicitly set
+  if (process.env.NODE_ENV === 'production') {
+    if (!process.env.NEXT_PUBLIC_API_URL) {
+      throw new Error(
+        'FATAL: NEXT_PUBLIC_API_URL environment variable is not configured. ' +
+        'Set it in Vercel Project Settings > Environment Variables before deploying.'
+      );
+    }
+    return process.env.NEXT_PUBLIC_API_URL;
+  }
 
-// Create axios instance
+  // For development: use local backend or explicit env var
+  return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
+}
+
+const API_BASE_URL = getApiBaseUrl();
+
+// Create axios instance with better error handling
 const apiClient: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
   timeout: 15000,
@@ -52,6 +68,14 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   (response) => response,
   (error: AxiosError<ApiError>) => {
+    // Detect connectivity issues (backend unreachable)
+    if (!error.response) {
+      console.error(
+        '🔴 Backend unreachable. Check that backend is running at:',
+        API_BASE_URL
+      );
+    }
+
     // Handle authentication errors
     if (error.response?.status === 401) {
       // Clear token and redirect to login

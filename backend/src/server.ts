@@ -12,10 +12,12 @@ import dotenv from 'dotenv';
 
 // Import configuration
 import { testConnection } from './config/database';
+import { initSentry } from './config/sentry';
+import Sentry from './config/sentry';
 
 // Import middleware
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
-import { apiLimiter } from './middleware/rateLimiter';
+import { publicLimiter } from './middleware/rateLimiter';
 
 // Import routes
 import authRoutes from './routes/auth';
@@ -27,12 +29,19 @@ import journalRoutes from './routes/journal';
 // Load environment variables
 dotenv.config();
 
+// Initialize Sentry error tracking (before creating app)
+initSentry();
+
 // Create Express application
 const app: Application = express();
 
 // ============================================================================
 // MIDDLEWARE
 // ============================================================================
+
+// Sentry request and tracing handlers (must be first)
+app.use(Sentry.Handlers.requestHandler());
+app.use(Sentry.Handlers.tracingHandler());
 
 // Security middleware
 app.use(helmet()); // Set security headers
@@ -59,15 +68,12 @@ if (process.env.NODE_ENV === 'development') {
   app.use(morgan('combined')); // Standard Apache combined log format in production
 }
 
-// Rate limiting
-app.use('/api', apiLimiter);
-
 // ============================================================================
 // ROUTES
 // ============================================================================
 
-// Health check endpoint
-app.get('/health', (req, res) => {
+// Health check endpoint (with public rate limiter)
+app.get('/health', publicLimiter, (req, res) => {
   res.status(200).json({
     status: 'healthy',
     timestamp: new Date().toISOString(),
@@ -82,8 +88,8 @@ app.use('/api/challenges', challengeRoutes);
 app.use('/api/progress', progressRoutes);
 app.use('/api/journal', journalRoutes);
 
-// Welcome route
-app.get('/', (req, res) => {
+// Welcome route (with public rate limiter)
+app.get('/', publicLimiter, (req, res) => {
   res.json({
     message: 'Welcome to Momentum API',
     version: '1.0.0',
@@ -94,6 +100,9 @@ app.get('/', (req, res) => {
 // ============================================================================
 // ERROR HANDLING
 // ============================================================================
+
+// Sentry error handler - must be before other error handlers
+app.use(Sentry.Handlers.errorHandler());
 
 // 404 handler - must be after all routes
 app.use(notFoundHandler);

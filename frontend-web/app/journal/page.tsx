@@ -7,7 +7,7 @@
 
 import { useEffect, useState } from 'react';
 import { challengeAPI, journalAPI } from '@/lib/api';
-import type { DailyChallenge, EvidenceEntry } from '@momentum/shared';
+import type { DailyChallenge } from '@momentum/shared';
 import { formatDate, getZoneColor, getZoneLabel } from '@/lib/utils';
 import Button from '../components/Button';
 
@@ -125,7 +125,7 @@ export default function JournalPage() {
                     {dailyChallenge.reflectionText && (
                       <div className="mt-4 p-4 bg-gray-50 rounded-lg">
                         <h4 className="text-sm font-medium text-gray-700 mb-2">Reflection</h4>
-                        <p className="text-gray-700 italic">"{dailyChallenge.reflectionText}"</p>
+                        <p className="text-gray-700 italic">&quot;{dailyChallenge.reflectionText}&quot;</p>
                       </div>
                     )}
 
