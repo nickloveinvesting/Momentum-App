@@ -92,7 +92,7 @@ CREATE TABLE challenges (
     difficulty IN ('low', 'medium-low', 'medium', 'medium-high', 'high')
   ),
   CONSTRAINT check_evidence_type CHECK (
-    evidence_type IN ('photo', 'screenshot', 'voice', 'honor')
+    evidence_type IN ('photo', 'screenshot', 'voice', 'honor', 'text')
   )
 );
 
@@ -119,7 +119,7 @@ CREATE TABLE daily_challenges (
   reflection_text TEXT,
 
   CONSTRAINT check_status CHECK (
-    status IN ('pending', 'accepted', 'completed', 'skipped')
+    status IN ('pending', 'accepted', 'completed', 'skipped', 'missed')
   ),
   CONSTRAINT unique_user_date UNIQUE(user_id, scheduled_for)
 );

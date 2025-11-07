@@ -76,20 +76,16 @@ export const validateProfileUpdate: ValidationChain[] = [
 
 /**
  * Challenge completion validation rules
+ * MVP: Text-only evidence (20-1000 characters)
+ * Photo/voice evidence postponed to Phase 2
  */
 export const validateChallengeCompletion: ValidationChain[] = [
-  body('evidenceType')
-    .isIn(['photo', 'screenshot', 'voice', 'honor'])
-    .withMessage('Evidence type must be one of: photo, screenshot, voice, honor'),
-  body('evidenceUrl')
-    .optional()
-    .isURL()
-    .withMessage('Evidence URL must be a valid URL'),
-  body('reflectionText')
-    .optional()
-    .isString()
-    .isLength({ max: 1000 })
-    .withMessage('Reflection text must not exceed 1000 characters'),
+  body('evidenceText')
+    .trim()
+    .notEmpty()
+    .withMessage('Evidence description is required')
+    .isLength({ min: 20, max: 1000 })
+    .withMessage('Evidence must be between 20 and 1000 characters. Tell us what you did and how it went.'),
 ];
 
 /**

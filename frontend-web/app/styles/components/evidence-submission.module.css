@@ -1,0 +1,244 @@
+/**
+ * Evidence Submission Component Styles
+ * Professional, accessible, mobile-responsive design
+ */
+
+.evidenceContainer {
+  max-width: 100%;
+  padding: var(--spacing-lg, 1.5rem);
+  background: var(--background, #ffffff);
+  border-radius: var(--border-radius-lg, 1rem);
+}
+
+.header {
+  margin-bottom: var(--spacing-lg, 1.5rem);
+}
+
+.title {
+  font-size: var(--font-size-2xl, 1.5rem);
+  font-weight: var(--font-weight-semibold, 600);
+  line-height: 1.3;
+  color: var(--text-primary, #111827);
+  margin-bottom: var(--spacing-sm, 0.5rem);
+}
+
+.description {
+  font-size: var(--font-size-base, 1rem);
+  line-height: 1.6;
+  color: var(--text-secondary, #6B7280);
+}
+
+/* Textarea Styling */
+.textareaWrapper {
+  position: relative;
+  margin-bottom: var(--spacing-md, 1rem);
+}
+
+.textarea {
+  width: 100%;
+  min-height: 200px;
+  padding: 1rem;
+  font-size: 1rem;
+  line-height: 1.6;
+  border: 2px solid var(--neutral-200, #E5E7EB);
+  border-radius: 0.75rem;
+  resize: vertical;
+  transition: border-color 200ms ease-in-out, box-shadow 200ms ease-in-out;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+.textarea:focus {
+  outline: none;
+  border-color: var(--primary, #0EA5E9);
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+}
+
+.textarea:disabled {
+  background-color: var(--neutral-50, #F9FAFB);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.textarea::placeholder {
+  color: var(--neutral-400, #9CA3AF);
+  font-size: 0.875rem;
+}
+
+/* Character Counter */
+.charCounter {
+  position: absolute;
+  bottom: 0.75rem;
+  right: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 0.25rem 0.5rem;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 0.375rem;
+  backdrop-filter: blur(4px);
+  transition: color 200ms ease-in-out;
+}
+
+.charCounter.valid {
+  color: var(--success, #22C55E);
+}
+
+.charCounter.invalid {
+  color: var(--danger, #EF4444);
+}
+
+.charCounter.neutral {
+  color: var(--neutral-500, #6B7280);
+}
+
+/* Validation Checkmark */
+.validationMessage {
+  display: flex;
+  align-items: center;
+  font-size: 0.875rem;
+  color: var(--success, #22C55E);
+  margin-bottom: var(--spacing-md, 1rem);
+}
+
+.validationIcon {
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-right: 0.5rem;
+  flex-shrink: 0;
+}
+
+/* Error Message */
+.errorMessage {
+  display: flex;
+  align-items-start;
+  padding: 0.75rem;
+  background-color: #FEF2F2;
+  border: 1px solid #FCA5A5;
+  border-radius: 0.5rem;
+  color: var(--danger, #EF4444);
+  font-size: 0.875rem;
+  margin-bottom: var(--spacing-md, 1rem);
+}
+
+.errorIcon {
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-right: 0.5rem;
+  flex-shrink: 0;
+  margin-top: 0.125rem;
+}
+
+/* Helper Text */
+.helperText {
+  font-size: 0.875rem;
+  color: var(--neutral-500, #6B7280);
+  margin-bottom: var(--spacing-lg, 1.5rem);
+  line-height: 1.5;
+}
+
+.helperTextSmall {
+  font-size: 0.75rem;
+  color: var(--neutral-400, #9CA3AF);
+  margin-top: 0.25rem;
+}
+
+/* Action Buttons */
+.actionButtons {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: var(--spacing-md, 1rem);
+}
+
+.submitButton {
+  flex: 1;
+  min-height: 44px; /* Mobile touch target */
+}
+
+.skipButton {
+  min-height: 44px; /* Mobile touch target */
+}
+
+/* Skip Confirmation */
+.skipConfirmation {
+  padding: 0.75rem;
+  background-color: #FFFBEB;
+  border: 1px solid #FDE047;
+  border-radius: 0.5rem;
+  color: #92400E;
+  font-size: 0.875rem;
+  margin-bottom: var(--spacing-md, 1rem);
+}
+
+.skipConfirmation p {
+  margin: 0;
+}
+
+.skipConfirmation p + p {
+  margin-top: 0.5rem;
+}
+
+/* Phase 2 Preview */
+.phasePreview {
+  padding-top: var(--spacing-md, 1rem);
+  border-top: 1px solid var(--neutral-200, #E5E7EB);
+  text-align: center;
+}
+
+.phasePreview p {
+  font-size: 0.75rem;
+  color: var(--neutral-400, #9CA3AF);
+  margin: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+  .evidenceContainer {
+    padding: var(--spacing-md, 1rem);
+  }
+
+  .title {
+    font-size: 1.25rem; /* Slightly smaller on mobile */
+  }
+
+  .textarea {
+    min-height: 180px; /* Slightly shorter on mobile */
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+
+  .actionButtons {
+    flex-direction: column;
+  }
+
+  .skipButton {
+    width: 100%;
+  }
+
+  .charCounter {
+    font-size: 0.75rem;
+    bottom: 0.5rem;
+    right: 0.5rem;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .textarea,
+  .charCounter {
+    transition: none;
+  }
+}
+
+/* Dark Mode Support (Future) */
+@media (prefers-color-scheme: dark) {
+  /*
+   * Dark mode styles will be added in Phase 2
+   * For now, light mode only
+   */
+}
+
+/* Print Styles */
+@media print {
+  .skipButton,
+  .phasePreview {
+    display: none;
+  }
+}

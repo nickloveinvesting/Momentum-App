@@ -65,6 +65,7 @@ export const acceptChallengeHandler = asyncHandler(
 /**
  * Complete a challenge
  * POST /api/challenges/:id/complete
+ * MVP: Text-only evidence (20-1000 characters)
  */
 export const completeChallengeHandler = asyncHandler(
   async (req: Request, res: Response): Promise<void> => {
@@ -73,14 +74,12 @@ export const completeChallengeHandler = asyncHandler(
     }
 
     const { id } = req.params;
-    const { evidenceType, evidenceUrl, reflectionText }: ChallengeCompletionRequest = req.body;
+    const { evidenceText } = req.body;
 
     const challenge = await completeChallenge(
       req.user.userId,
       id,
-      evidenceType,
-      evidenceUrl,
-      reflectionText
+      evidenceText
     );
 
     res.status(200).json(challenge);
