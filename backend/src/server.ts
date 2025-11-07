@@ -13,7 +13,7 @@ import dotenv from 'dotenv';
 // Import configuration
 import { testConnection } from './config/database';
 import { initSentry } from './config/sentry';
-import Sentry from './config/sentry';
+import * as Sentry from '@sentry/node';
 
 // Import middleware
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
