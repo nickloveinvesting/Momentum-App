@@ -8,7 +8,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { challengeAPI } from '@/lib/api';
-import type { Challenge, DailyChallenge, EvidenceType } from '@momentum/shared';
+import type { Challenge, DailyChallenge } from '@momentum/shared';
 import { getZoneColor, getZoneLabel, getDifficultyLabel, getZoneBorderColor } from '@/lib/utils';
 import Button from '@/app/components/Button';
 import EvidenceUpload from '@/app/components/EvidenceUpload';
@@ -171,7 +171,7 @@ export default function ChallengeDetailPage() {
               {/* Identity Frame */}
               <div className="bg-gradient-to-r from-primary-900 to-primary-700 text-white rounded-lg p-6 mb-8">
                 <h2 className="text-xl font-bold mb-3">Identity Frame</h2>
-                <p className="text-lg italic">"{challenge.identityFrame}"</p>
+                <p className="text-lg italic">&quot;{challenge.identityFrame}&quot;</p>
               </div>
 
               {/* Meaning Connection */}

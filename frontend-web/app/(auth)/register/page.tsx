@@ -35,8 +35,9 @@ export default function RegisterPage() {
       const response = await authAPI.register({ ...data, timezone });
       setUser(response.user);
       router.push('/onboarding');
-    } catch (err: any) {
-      setError(err.message || 'Registration failed');
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Registration failed';
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }

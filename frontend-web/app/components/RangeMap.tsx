@@ -137,15 +137,11 @@ export default function RangeMap({
     ctx.stroke();
 
     // Draw zone segments with colors
-    zones.forEach((zone, index) => {
-      const nextZone = zones[(index + 1) % zones.length];
+    zones.forEach((zone) => {
       const radius = rangeMap.currentRadius[zone.key] * scale;
-      const nextRadius = rangeMap.currentRadius[nextZone.key] * scale;
 
       const x1 = centerX + Math.cos(zone.angle) * radius;
       const y1 = centerY + Math.sin(zone.angle) * radius;
-      const x2 = centerX + Math.cos(nextZone.angle) * nextRadius;
-      const y2 = centerY + Math.sin(nextZone.angle) * nextRadius;
 
       // Draw arc segment
       const color = getZoneHexColor(zone.key);
