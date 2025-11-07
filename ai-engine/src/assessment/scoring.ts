@@ -23,7 +23,7 @@ import {
   AvoidanceZone,
   AvoidanceScores,
   AVOIDANCE_SCORE_MIN,
-  AVOIDANCE_SCORE_MAX
+  AVOIDANCE_SCORE_MAX,
 } from '@momentum/shared';
 import { generateAssessment, mapAnswerToScore } from './questions';
 
@@ -37,7 +37,10 @@ import { generateAssessment, mapAnswerToScore } from './questions';
  * @param answers Array of assessment answers
  * @returns Complete avoidance profile
  */
-export function scoreAssessment(userId: string, answers: AssessmentAnswer[]): AvoidanceProfile {
+export function scoreAssessment(
+  userId: string,
+  answers: AssessmentAnswer[]
+): AvoidanceProfile {
   const questions = generateAssessment();
 
   // Create a map of questionId -> answer for quick lookup
@@ -68,7 +71,7 @@ export function scoreAssessment(userId: string, answers: AssessmentAnswer[]): Av
     intensityPreference,
     changeStyle,
     assessedAt: new Date(),
-    updatedAt: new Date()
+    updatedAt: new Date(),
   };
 }
 
@@ -81,15 +84,22 @@ export function scoreAssessment(userId: string, answers: AssessmentAnswer[]): Av
  * @param answerMap Map of questionId to answer value
  * @returns Scores for each avoidance zone
  */
-function calculateZoneScores(answerMap: Map<string, string | number>): AvoidanceScores {
+function calculateZoneScores(
+  answerMap: Map<string, string | number>
+): AvoidanceScores {
   const questions = generateAssessment();
-  const zones: AvoidanceZone[] = ['social', 'physical', 'professional', 'emotional'];
+  const zones: AvoidanceZone[] = [
+    'social',
+    'physical',
+    'professional',
+    'emotional',
+  ];
 
   const scores: AvoidanceScores = {
     social: 0,
     physical: 0,
     professional: 0,
-    emotional: 0
+    emotional: 0,
   };
 
   zones.forEach(zone => {
@@ -241,7 +251,10 @@ function determineChangeStyle(
  * @param zone The zone to get score for
  * @returns Score (0-10)
  */
-export function getZoneScore(profile: AvoidanceProfile, zone: AvoidanceZone): number {
+export function getZoneScore(
+  profile: AvoidanceProfile,
+  zone: AvoidanceZone
+): number {
   switch (zone) {
     case 'social':
       return profile.socialScore;
@@ -265,7 +278,7 @@ export function getAllZoneScores(profile: AvoidanceProfile): AvoidanceScores {
     social: profile.socialScore,
     physical: profile.physicalScore,
     professional: profile.professionalScore,
-    emotional: profile.emotionalScore
+    emotional: profile.emotionalScore,
   };
 }
 
@@ -279,11 +292,16 @@ export function getAllZoneScores(profile: AvoidanceProfile): AvoidanceScores {
  * @param profile The user's avoidance profile
  * @returns Object mapping zone to selection weight
  */
-export function calculateZoneWeights(profile: AvoidanceProfile): Record<AvoidanceZone, number> {
+export function calculateZoneWeights(
+  profile: AvoidanceProfile
+): Record<AvoidanceZone, number> {
   const scores = getAllZoneScores(profile);
 
   // Calculate total score for normalization
-  const totalScore = Object.values(scores).reduce((sum, score) => sum + score, 0);
+  const totalScore = Object.values(scores).reduce(
+    (sum, score) => sum + score,
+    0
+  );
 
   // Avoid division by zero
   if (totalScore === 0) {
@@ -291,7 +309,7 @@ export function calculateZoneWeights(profile: AvoidanceProfile): Record<Avoidanc
       social: 0.25,
       physical: 0.25,
       professional: 0.25,
-      emotional: 0.25
+      emotional: 0.25,
     };
   }
 
@@ -300,6 +318,6 @@ export function calculateZoneWeights(profile: AvoidanceProfile): Record<Avoidanc
     social: scores.social / totalScore,
     physical: scores.physical / totalScore,
     professional: scores.professional / totalScore,
-    emotional: scores.emotional / totalScore
+    emotional: scores.emotional / totalScore,
   };
 }

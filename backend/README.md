@@ -37,11 +37,13 @@ The Momentum backend provides a RESTful API for managing users, challenges, prog
 ## Installation
 
 1. **Install dependencies**:
+
    ```bash
    npm install
    ```
 
 2. **Set up environment variables**:
+
    ```bash
    cp .env.example .env
    ```
@@ -49,6 +51,7 @@ The Momentum backend provides a RESTful API for managing users, challenges, prog
    Edit `.env` and configure your database and JWT settings.
 
 3. **Set up the database**:
+
    ```bash
    # Create the database
    createdb momentum
@@ -85,46 +88,46 @@ npm start
 
 ### Authentication
 
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| POST | `/api/auth/register` | Register a new user | No |
-| POST | `/api/auth/login` | Login with email/password | No |
-| GET | `/api/auth/me` | Get current user | Yes |
-| POST | `/api/auth/logout` | Logout current user | Yes |
+| Method | Endpoint             | Description               | Auth Required |
+| ------ | -------------------- | ------------------------- | ------------- |
+| POST   | `/api/auth/register` | Register a new user       | No            |
+| POST   | `/api/auth/login`    | Login with email/password | No            |
+| GET    | `/api/auth/me`       | Get current user          | Yes           |
+| POST   | `/api/auth/logout`   | Logout current user       | Yes           |
 
 ### Users
 
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| GET | `/api/users/profile` | Get user profile | Yes |
-| PUT | `/api/users/profile` | Update user profile | Yes |
+| Method | Endpoint             | Description         | Auth Required |
+| ------ | -------------------- | ------------------- | ------------- |
+| GET    | `/api/users/profile` | Get user profile    | Yes           |
+| PUT    | `/api/users/profile` | Update user profile | Yes           |
 
 ### Challenges
 
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| GET | `/api/challenges/today` | Get today's challenge | Yes |
-| POST | `/api/challenges/:id/accept` | Accept a challenge | Yes |
-| POST | `/api/challenges/:id/complete` | Complete challenge with evidence | Yes |
-| POST | `/api/challenges/:id/skip` | Skip today's challenge | Yes |
-| GET | `/api/challenges/history` | Get challenge history | Yes |
+| Method | Endpoint                       | Description                      | Auth Required |
+| ------ | ------------------------------ | -------------------------------- | ------------- |
+| GET    | `/api/challenges/today`        | Get today's challenge            | Yes           |
+| POST   | `/api/challenges/:id/accept`   | Accept a challenge               | Yes           |
+| POST   | `/api/challenges/:id/complete` | Complete challenge with evidence | Yes           |
+| POST   | `/api/challenges/:id/skip`     | Skip today's challenge           | Yes           |
+| GET    | `/api/challenges/history`      | Get challenge history            | Yes           |
 
 ### Progress
 
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| GET | `/api/progress/range-map` | Get range map data | Yes |
-| GET | `/api/progress/streak` | Get streak status | Yes |
-| GET | `/api/progress/stats` | Get user statistics | Yes |
-| POST | `/api/progress/freeze-streak` | Use streak freeze | Yes |
+| Method | Endpoint                      | Description         | Auth Required |
+| ------ | ----------------------------- | ------------------- | ------------- |
+| GET    | `/api/progress/range-map`     | Get range map data  | Yes           |
+| GET    | `/api/progress/streak`        | Get streak status   | Yes           |
+| GET    | `/api/progress/stats`         | Get user statistics | Yes           |
+| POST   | `/api/progress/freeze-streak` | Use streak freeze   | Yes           |
 
 ### Journal
 
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| GET | `/api/journal/entries` | Get all journal entries | Yes |
-| POST | `/api/journal/entry` | Create journal entry | Yes |
-| GET | `/api/journal/entry/:id` | Get specific entry | Yes |
+| Method | Endpoint                 | Description             | Auth Required |
+| ------ | ------------------------ | ----------------------- | ------------- |
+| GET    | `/api/journal/entries`   | Get all journal entries | Yes           |
+| POST   | `/api/journal/entry`     | Create journal entry    | Yes           |
+| GET    | `/api/journal/entry/:id` | Get specific entry      | Yes           |
 
 ## Project Structure
 
@@ -185,6 +188,7 @@ All errors follow a consistent format:
 ```
 
 Common status codes:
+
 - `200`: Success
 - `201`: Created
 - `400`: Bad Request (validation error)
@@ -241,13 +245,15 @@ npm run lint
 See `.env.example` for all available configuration options.
 
 Required variables:
+
 - `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`
 - `JWT_SECRET`
 
 Optional variables:
+
 - `PORT` (default: 3000)
 - `NODE_ENV` (default: development)
-- `CORS_ORIGIN` (default: *)
+- `CORS_ORIGIN` (default: \*)
 
 ## Contributing
 

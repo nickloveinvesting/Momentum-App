@@ -38,7 +38,7 @@ import {
   AvoidanceZone,
   ChallengeDifficulty,
   ChallengeSelectionContext,
-  DailyChallenge
+  DailyChallenge,
 } from '@momentum/shared';
 import { applyStandardFilters, filterByMultipleZones } from './filters';
 import { scoreAndRankChallenges, weightedRandomSelection } from './scoring';
@@ -59,7 +59,8 @@ export function selectDailyChallenge(
   availableChallenges: Challenge[],
   recentChallenges: DailyChallenge[] = []
 ): Challenge {
-  const { user, profile, dayNumber, completedChallenges, currentTime } = context;
+  const { user, profile, dayNumber, completedChallenges, currentTime } =
+    context;
 
   // ========================================================================
   // STEP 1: Determine target difficulty based on week and change style
@@ -83,7 +84,7 @@ export function selectDailyChallenge(
     timeCommitment: profile.intensityPreference,
     completedChallengeIds: completedChallenges,
     yesterdayChallenge,
-    activeOnly: true
+    activeOnly: true,
   });
 
   // If we have target zones, filter to those zones
@@ -118,7 +119,7 @@ export function selectDailyChallenge(
     {
       ...recentContext,
       currentTime,
-      topN: 5 // Get top 5 candidates
+      topN: 5, // Get top 5 candidates
     }
   );
 
@@ -151,7 +152,7 @@ function getTargetDifficulty(
     1: 'low',
     2: 'low',
     3: 'medium-low',
-    4: 'medium'
+    4: 'medium',
   };
 
   // Moderate progression: standard algorithm
@@ -159,7 +160,7 @@ function getTargetDifficulty(
     1: 'low',
     2: 'medium-low',
     3: 'medium',
-    4: 'medium-high'
+    4: 'medium-high',
   };
 
   // Aggressive progression: faster ramp-up
@@ -167,13 +168,13 @@ function getTargetDifficulty(
     1: 'low',
     2: 'medium',
     3: 'medium-high',
-    4: 'high'
+    4: 'high',
   };
 
   const progressionMap = {
     gradual: gradualProgression,
     moderate: moderateProgression,
-    aggressive: aggressiveProgression
+    aggressive: aggressiveProgression,
   };
 
   return progressionMap[changeStyle][weekNumber] || 'medium';
@@ -197,7 +198,12 @@ function getTargetZones(
   profile: AvoidanceProfile,
   recentChallenges: DailyChallenge[]
 ): AvoidanceZone[] {
-  const allZones: AvoidanceZone[] = ['social', 'physical', 'professional', 'emotional'];
+  const allZones: AvoidanceZone[] = [
+    'social',
+    'physical',
+    'professional',
+    'emotional',
+  ];
 
   switch (weekNumber) {
     case 1:
@@ -207,7 +213,10 @@ function getTargetZones(
     case 2:
       // Week 2: Rotate through other zones (avoid primary zone fatigue)
       // But still include primary if it's been a few days
-      const lastPrimaryDay = getLastZoneDay(recentChallenges, profile.primaryZone);
+      const lastPrimaryDay = getLastZoneDay(
+        recentChallenges,
+        profile.primaryZone
+      );
       if (lastPrimaryDay === -1 || lastPrimaryDay >= 3) {
         // Allow primary if it's been 3+ days
         return allZones;
@@ -235,14 +244,17 @@ function getTargetZones(
  * @param recentChallenges Recent daily challenges
  * @returns Yesterday's challenge or null
  */
-function getYesterdayChallenge(recentChallenges: DailyChallenge[]): DailyChallenge | null {
+function getYesterdayChallenge(
+  recentChallenges: DailyChallenge[]
+): DailyChallenge | null {
   if (recentChallenges.length === 0) {
     return null;
   }
 
   // Sort by scheduled date (descending)
   const sorted = [...recentChallenges].sort(
-    (a, b) => new Date(b.scheduledFor).getTime() - new Date(a.scheduledFor).getTime()
+    (a, b) =>
+      new Date(b.scheduledFor).getTime() - new Date(a.scheduledFor).getTime()
   );
 
   return sorted[0] || null;
@@ -255,9 +267,13 @@ function getYesterdayChallenge(recentChallenges: DailyChallenge[]): DailyChallen
  * @param zone Zone to check
  * @returns Days ago (0 = today, 1 = yesterday, -1 = not found)
  */
-function getLastZoneDay(recentChallenges: DailyChallenge[], zone: AvoidanceZone): number {
+function getLastZoneDay(
+  recentChallenges: DailyChallenge[],
+  zone: AvoidanceZone
+): number {
   const sorted = [...recentChallenges].sort(
-    (a, b) => new Date(b.scheduledFor).getTime() - new Date(a.scheduledFor).getTime()
+    (a, b) =>
+      new Date(b.scheduledFor).getTime() - new Date(a.scheduledFor).getTime()
   );
 
   for (let i = 0; i < sorted.length; i++) {
@@ -284,7 +300,10 @@ function buildScoringContext(recentChallenges: DailyChallenge[]): {
 
   // Get last 3 challenges for variety scoring
   const last3 = recentChallenges
-    .sort((a, b) => new Date(b.scheduledFor).getTime() - new Date(a.scheduledFor).getTime())
+    .sort(
+      (a, b) =>
+        new Date(b.scheduledFor).getTime() - new Date(a.scheduledFor).getTime()
+    )
     .slice(0, 3);
 
   last3.forEach(dc => {
@@ -321,7 +340,7 @@ function fallbackSelection(
     timeCommitment: profile.intensityPreference,
     completedChallengeIds,
     yesterdayChallenge,
-    activeOnly: true
+    activeOnly: true,
   });
 
   if (candidates.length > 0) return candidates;
@@ -330,7 +349,7 @@ function fallbackSelection(
   candidates = applyStandardFilters(availableChallenges, {
     timeCommitment: profile.intensityPreference,
     completedChallengeIds,
-    activeOnly: true
+    activeOnly: true,
   });
 
   if (candidates.length > 0) return candidates;
@@ -338,7 +357,7 @@ function fallbackSelection(
   // 3. Remove time constraint (allow longer challenges if needed)
   candidates = applyStandardFilters(availableChallenges, {
     completedChallengeIds,
-    activeOnly: true
+    activeOnly: true,
   });
 
   if (candidates.length > 0) return candidates;
@@ -347,7 +366,7 @@ function fallbackSelection(
   // This should rarely happen
   candidates = applyStandardFilters(availableChallenges, {
     completedChallengeIds: [], // Don't filter out completed
-    activeOnly: true
+    activeOnly: true,
   });
 
   return candidates;
@@ -375,22 +394,28 @@ export function previewChallengeSequence(
     const dayContext = {
       ...context,
       dayNumber: context.dayNumber + i,
-      completedChallenges: completedIds
+      completedChallenges: completedIds,
     };
 
     // Create mock recent challenges for context
-    const recentChallenges: DailyChallenge[] = sequence.slice(-3).map((challenge, idx) => ({
-      id: `preview-${i - idx}`,
-      userId: context.user.id,
-      challengeId: challenge.id,
-      challenge,
-      deliveredAt: new Date(),
-      scheduledFor: new Date(),
-      status: 'completed' as const,
-      completedAt: new Date()
-    }));
+    const recentChallenges: DailyChallenge[] = sequence
+      .slice(-3)
+      .map((challenge, idx) => ({
+        id: `preview-${i - idx}`,
+        userId: context.user.id,
+        challengeId: challenge.id,
+        challenge,
+        deliveredAt: new Date(),
+        scheduledFor: new Date(),
+        status: 'completed' as const,
+        completedAt: new Date(),
+      }));
 
-    const selected = selectDailyChallenge(dayContext, availableChallenges, recentChallenges);
+    const selected = selectDailyChallenge(
+      dayContext,
+      availableChallenges,
+      recentChallenges
+    );
     sequence.push(selected);
     completedIds.push(selected.id);
   }

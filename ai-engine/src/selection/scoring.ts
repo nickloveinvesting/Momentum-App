@@ -24,7 +24,7 @@ import {
   AvoidanceProfile,
   AvoidanceZone,
   ChallengeDifficulty,
-  User
+  User,
 } from '@momentum/shared';
 import { getZoneScore } from '../assessment/scoring';
 
@@ -64,18 +64,25 @@ export function scoreChallenge(
   } else if (challenge.zone === profile.secondaryZone) {
     reasons.push(`Targets secondary avoidance zone (${challenge.zone})`);
   } else {
-    reasons.push(`Addresses ${challenge.zone} avoidance (score: ${zoneScore.toFixed(1)})`);
+    reasons.push(
+      `Addresses ${challenge.zone} avoidance (score: ${zoneScore.toFixed(1)})`
+    );
   }
 
   // ========================================================================
   // 2. DIFFICULTY PROGRESSION SCORE (0-25 points)
   // ========================================================================
   const weekNumber = Math.ceil(dayNumber / 7);
-  const expectedDifficulty = getExpectedDifficulty(weekNumber, profile.changeStyle);
+  const expectedDifficulty = getExpectedDifficulty(
+    weekNumber,
+    profile.changeStyle
+  );
 
   if (challenge.difficulty === expectedDifficulty) {
     score += 25;
-    reasons.push(`Perfect difficulty for week ${weekNumber} (${challenge.difficulty})`);
+    reasons.push(
+      `Perfect difficulty for week ${weekNumber} (${challenge.difficulty})`
+    );
   } else if (isAdjacentDifficulty(challenge.difficulty, expectedDifficulty)) {
     score += 15;
     reasons.push(`Close to week ${weekNumber} difficulty target`);
@@ -87,13 +94,22 @@ export function scoreChallenge(
   // ========================================================================
   // 3. TIME COMMITMENT MATCH (0-15 points)
   // ========================================================================
-  const maxTime = profile.intensityPreference === '5min' ? 5 :
-                  profile.intensityPreference === '10min' ? 10 : 15;
+  const maxTime =
+    profile.intensityPreference === '5min'
+      ? 5
+      : profile.intensityPreference === '10min'
+        ? 10
+        : 15;
 
-  if (challenge.estimatedTime <= maxTime && challenge.estimatedTime >= maxTime - 2) {
+  if (
+    challenge.estimatedTime <= maxTime &&
+    challenge.estimatedTime >= maxTime - 2
+  ) {
     // Within range and close to max preference
     score += 15;
-    reasons.push(`Time commitment matches preference (${challenge.estimatedTime}min)`);
+    reasons.push(
+      `Time commitment matches preference (${challenge.estimatedTime}min)`
+    );
   } else if (challenge.estimatedTime <= maxTime) {
     // Within range but much shorter
     score += 10;
@@ -107,7 +123,9 @@ export function scoreChallenge(
   // ========================================================================
   // 4. VARIETY BONUS/PENALTY (0-15 points)
   // ========================================================================
-  const recentZoneCount = context.completedZones.filter(z => z === challenge.zone).length;
+  const recentZoneCount = context.completedZones.filter(
+    z => z === challenge.zone
+  ).length;
   const recentDifficultyCount = context.completedDifficulties.filter(
     d => d === challenge.difficulty
   ).length;
@@ -159,7 +177,7 @@ export function scoreChallenge(
   return {
     challenge,
     score: Math.min(100, Math.max(0, score)),
-    reasoning: reasons.join(' • ')
+    reasoning: reasons.join(' • '),
   };
 }
 
@@ -217,7 +235,7 @@ function getExpectedDifficulty(
     1: 'low',
     2: 'medium-low',
     3: 'medium',
-    4: 'medium-high'
+    4: 'medium-high',
   };
 
   // Gradual: Stay at lower levels longer
@@ -225,7 +243,7 @@ function getExpectedDifficulty(
     1: 'low',
     2: 'low',
     3: 'medium-low',
-    4: 'medium'
+    4: 'medium',
   };
 
   // Aggressive: Push harder faster
@@ -233,13 +251,13 @@ function getExpectedDifficulty(
     1: 'low',
     2: 'medium',
     3: 'medium-high',
-    4: 'high'
+    4: 'high',
   };
 
   const progressionMap = {
     gradual: gradualProgression,
     moderate: baseProgression,
-    aggressive: aggressiveProgression
+    aggressive: aggressiveProgression,
   };
 
   return progressionMap[changeStyle][weekNumber] || 'medium';
@@ -256,7 +274,13 @@ function isAdjacentDifficulty(
   difficulty1: ChallengeDifficulty,
   difficulty2: ChallengeDifficulty
 ): boolean {
-  const order: ChallengeDifficulty[] = ['low', 'medium-low', 'medium', 'medium-high', 'high'];
+  const order: ChallengeDifficulty[] = [
+    'low',
+    'medium-low',
+    'medium',
+    'medium-high',
+    'high',
+  ];
   const index1 = order.indexOf(difficulty1);
   const index2 = order.indexOf(difficulty2);
 
@@ -273,7 +297,10 @@ function isAdjacentDifficulty(
  * @param currentTime Current time
  * @returns Score bonus (0-10)
  */
-export function getTimeOfDayScore(challenge: Challenge, currentTime: Date): number {
+export function getTimeOfDayScore(
+  challenge: Challenge,
+  currentTime: Date
+): number {
   // Placeholder: could enhance with challenge metadata about ideal timing
   // For now, return neutral score
   return 5;
@@ -292,7 +319,9 @@ export function getTimeOfDayScore(challenge: Challenge, currentTime: Date): numb
  * @param candidates Scored candidates
  * @returns Selected challenge
  */
-export function weightedRandomSelection(candidates: ChallengeCandidate[]): Challenge {
+export function weightedRandomSelection(
+  candidates: ChallengeCandidate[]
+): Challenge {
   if (candidates.length === 0) {
     throw new Error('No candidates available for selection');
   }

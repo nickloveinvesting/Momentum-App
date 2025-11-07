@@ -18,7 +18,7 @@ import {
   ChallengeDifficulty,
   AvoidanceZone,
   AvoidanceProfile,
-  DailyChallenge
+  DailyChallenge,
 } from '@momentum/shared';
 
 /**
@@ -64,7 +64,12 @@ export function filterByTimeCommitment(
   challenges: Challenge[],
   intensityPreference: '5min' | '10min' | '15min'
 ): Challenge[] {
-  const maxTime = intensityPreference === '5min' ? 5 : intensityPreference === '10min' ? 10 : 15;
+  const maxTime =
+    intensityPreference === '5min'
+      ? 5
+      : intensityPreference === '10min'
+        ? 10
+        : 15;
 
   return challenges.filter(c => c.estimatedTime <= maxTime);
 }
@@ -174,7 +179,10 @@ export function applyStandardFilters(
 
   // Avoid same zone as yesterday
   if (options.yesterdayChallenge !== undefined) {
-    filtered = filterOutSameZoneAsYesterday(filtered, options.yesterdayChallenge);
+    filtered = filterOutSameZoneAsYesterday(
+      filtered,
+      options.yesterdayChallenge
+    );
   }
 
   return filtered;

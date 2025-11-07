@@ -5,6 +5,7 @@ This package contains the intelligent personalization engine for the Momentum ap
 ## Overview
 
 The AI engine is responsible for:
+
 - **Assessment Generation**: Creating and scoring the 23-question avoidance profile assessment
 - **Challenge Selection**: Intelligently selecting daily challenges based on user profile and progress
 - **Implementation Intentions**: Generating "When-Then" triggers to increase completion rates
@@ -163,21 +164,25 @@ const options = generateIntentionOptions(selectedChallenge, user);
 The algorithm adapts challenge selection based on the week:
 
 **Week 1 (Days 1-7): Foundation Building**
+
 - Difficulty: LOW
 - Zone Focus: PRIMARY zone (highest avoidance)
 - Goal: Build confidence with early wins
 
 **Week 2 (Days 8-14): Expansion**
+
 - Difficulty: MEDIUM-LOW
 - Zone Focus: ROTATION (all zones)
 - Goal: Introduce variety, prevent zone fatigue
 
 **Week 3 (Days 15-21): Deepening**
+
 - Difficulty: MEDIUM
 - Zone Focus: WEIGHTED rotation (based on scores)
 - Goal: Deeper challenges across all zones
 
 **Week 4 (Days 22-28): Consolidation**
+
 - Difficulty: MEDIUM-HIGH (or HIGH for aggressive)
 - Zone Focus: PRIMARY + SECONDARY
 - Goal: Final push on key growth areas
@@ -185,6 +190,7 @@ The algorithm adapts challenge selection based on the week:
 ### Personalization Factors
 
 Each challenge is scored (0-100) based on:
+
 1. **Zone Alignment** (30 points): Match to avoidance scores
 2. **Difficulty Progression** (25 points): Week-appropriate difficulty
 3. **Time Commitment** (15 points): Fits user's stated capacity
@@ -194,6 +200,7 @@ Each challenge is scored (0-100) based on:
 ### Change Styles
 
 Users can choose their progression speed:
+
 - **Gradual**: Slow ramp-up (low → low → medium-low → medium)
 - **Moderate**: Standard progression (low → medium-low → medium → medium-high)
 - **Aggressive**: Fast ramp-up (low → medium → medium-high → high)
@@ -247,7 +254,7 @@ import {
   generateAssessment,
   scoreAssessment,
   selectDailyChallenge,
-  generateImplementationIntention
+  generateImplementationIntention,
 } from '@momentum/ai-engine';
 
 // POST /api/assessment - Get questions
@@ -276,18 +283,20 @@ app.post('/api/challenges/daily', async (req, res) => {
   const profile = await db.avoidanceProfile.findUnique({ where: { userId } });
   const completed = await db.dailyChallenge.findMany({
     where: { userId, status: 'completed' },
-    select: { challengeId: true }
+    select: { challengeId: true },
   });
   const recent = await db.dailyChallenge.findMany({
     where: { userId },
     orderBy: { scheduledFor: 'desc' },
     take: 7,
-    include: { challenge: true }
+    include: { challenge: true },
   });
 
   // Get day number
   const startDate = new Date(user.createdAt);
-  const dayNumber = Math.ceil((Date.now() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+  const dayNumber = Math.ceil(
+    (Date.now() - startDate.getTime()) / (1000 * 60 * 60 * 24)
+  );
 
   // Get available challenges
   const challenges = await db.challenge.findMany({ where: { isActive: true } });
@@ -299,7 +308,7 @@ app.post('/api/challenges/daily', async (req, res) => {
       profile,
       dayNumber,
       completedChallenges: completed.map(c => c.challengeId),
-      currentTime: new Date()
+      currentTime: new Date(),
     },
     challenges,
     recent
@@ -314,14 +323,14 @@ app.post('/api/challenges/daily', async (req, res) => {
       userId,
       challengeId: selected.id,
       scheduledFor: new Date(),
-      status: 'pending'
-    }
+      status: 'pending',
+    },
   });
 
   res.json({
     challenge: selected,
     intention,
-    dailyChallenge
+    dailyChallenge,
   });
 });
 ```
@@ -329,6 +338,7 @@ app.post('/api/challenges/daily', async (req, res) => {
 ## Behavioral Science References
 
 This engine is based on research from:
+
 - **Implementation Intentions**: Gollwitzer, P. M., & Sheeran, P. (2006)
 - **Progressive Overload**: Kahneman & Tversky's Prospect Theory
 - **Self-Efficacy**: Bandura, A. (1977)

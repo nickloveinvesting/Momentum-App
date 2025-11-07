@@ -27,7 +27,7 @@ import {
   Challenge,
   User,
   ImplementationIntention,
-  AvoidanceZone
+  AvoidanceZone,
 } from '@momentum/shared';
 
 /**
@@ -80,7 +80,7 @@ function personalizeExistingIntention(
   // Future enhancement: Replace placeholders like {{time}} or {{user_name}}
   return {
     trigger: intention.trigger,
-    action: intention.action
+    action: intention.action,
   };
 }
 
@@ -133,81 +133,81 @@ function generateTrigger(
         'When I finish my morning coffee',
         'When I check my phone in the morning',
         'When I finish breakfast',
-        'When I get ready for the day'
+        'When I get ready for the day',
       ],
       afternoon: [
         'When I take my lunch break',
         'When I finish a work task',
         'When I have a free moment in the afternoon',
-        'When I step outside for fresh air'
+        'When I step outside for fresh air',
       ],
       evening: [
         'When I finish dinner',
         'When I wind down for the evening',
         'When I check social media',
-        'When I have free time tonight'
-      ]
+        'When I have free time tonight',
+      ],
     },
     physical: {
       morning: [
         'When I wake up',
         'When I brush my teeth',
         'When I make my morning coffee',
-        'When I get out of bed'
+        'When I get out of bed',
       ],
       afternoon: [
         'When I take a break from work',
         'When I feel low energy in the afternoon',
         'When I finish lunch',
-        'When I notice tension in my body'
+        'When I notice tension in my body',
       ],
       evening: [
         'When I get home',
         'When I change into comfortable clothes',
         'When I finish work for the day',
-        'When I prepare for bed'
-      ]
+        'When I prepare for bed',
+      ],
     },
     professional: {
       morning: [
         'When I sit down at my desk',
         'When I open my work computer',
         'When I review my to-do list',
-        'When I start my workday'
+        'When I start my workday',
       ],
       afternoon: [
         'When I check my calendar',
         'When I take a coffee break',
         'When I finish a meeting',
-        'When I feel stuck on a task'
+        'When I feel stuck on a task',
       ],
       evening: [
         'When I review my day',
         'When I plan for tomorrow',
         'When I close my laptop',
-        'When I reflect on work'
-      ]
+        'When I reflect on work',
+      ],
     },
     emotional: {
       morning: [
         'When I have a quiet moment in the morning',
-        'When I notice how I\'m feeling',
+        "When I notice how I'm feeling",
         'When I take my first deep breath of the day',
-        'When I journal in the morning'
+        'When I journal in the morning',
       ],
       afternoon: [
         'When I feel stressed',
         'When I notice tension building',
         'When I take a mindful pause',
-        'When I step away from screens'
+        'When I step away from screens',
       ],
       evening: [
         'When I unwind for the night',
         'When I reflect on my day',
         'When I feel emotions surfacing',
-        'When I have quiet time alone'
-      ]
-    }
+        'When I have quiet time alone',
+      ],
+    },
   };
 
   const options = triggerTemplates[zone][timeOfDay];
@@ -252,7 +252,11 @@ export function generateIntentionOptions(
   challenge: Challenge,
   user: User
 ): ImplementationIntention[] {
-  const timeOptions: ('morning' | 'afternoon' | 'evening')[] = ['morning', 'afternoon', 'evening'];
+  const timeOptions: ('morning' | 'afternoon' | 'evening')[] = [
+    'morning',
+    'afternoon',
+    'evening',
+  ];
 
   return timeOptions.map(time =>
     generateImplementationIntention(challenge, user, time)
@@ -283,7 +287,7 @@ export function recommendTriggerTime(
   const timeCount = {
     morning: 0,
     afternoon: 0,
-    evening: 0
+    evening: 0,
   };
 
   completionHistory.forEach(completion => {
@@ -298,7 +302,9 @@ export function recommendTriggerTime(
   });
 
   // Return most common time
-  const mostCommon = Object.entries(timeCount).sort((a, b) => b[1] - a[1])[0][0];
+  const mostCommon = Object.entries(timeCount).sort(
+    (a, b) => b[1] - a[1]
+  )[0][0];
   return mostCommon as 'morning' | 'afternoon' | 'evening';
 }
 
@@ -335,19 +341,23 @@ export function validateIntention(intention: ImplementationIntention): {
   // Check action clarity
   if (intention.action.length < 10) {
     issues.push('Action is too vague');
-    suggestions.push('Be more specific about what you\'ll do');
+    suggestions.push("Be more specific about what you'll do");
   }
 
   // Check for time-bound elements
-  const hasTimeElement = /\d+\s*(min|minute|hour|second)/i.test(intention.action);
+  const hasTimeElement = /\d+\s*(min|minute|hour|second)/i.test(
+    intention.action
+  );
   if (!hasTimeElement) {
-    suggestions.push('Consider adding a time constraint (e.g., "for 5 minutes")');
+    suggestions.push(
+      'Consider adding a time constraint (e.g., "for 5 minutes")'
+    );
   }
 
   return {
     isValid: issues.length === 0,
     issues,
-    suggestions
+    suggestions,
   };
 }
 

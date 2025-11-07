@@ -48,7 +48,7 @@ pool.on('connect', () => {
   console.log('✅ Database connected successfully');
 });
 
-pool.on('error', (err) => {
+pool.on('error', err => {
   console.error('❌ Unexpected database error:', err);
   process.exit(-1);
 });
@@ -64,7 +64,10 @@ export async function query<T>(
   try {
     const result = await pool.query<T>(text, params);
     const duration = Date.now() - start;
-    console.log(`Query executed in ${duration}ms:`, { text, rows: result.rowCount });
+    console.log(`Query executed in ${duration}ms:`, {
+      text,
+      rows: result.rowCount,
+    });
     return result;
   } catch (error) {
     console.error('Database query error:', { text, error });

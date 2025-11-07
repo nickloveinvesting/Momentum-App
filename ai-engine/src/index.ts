@@ -28,14 +28,14 @@ export {
   generateAssessment,
   getQuestionsByZone,
   getIntensityQuestions,
-  mapAnswerToScore
+  mapAnswerToScore,
 } from './assessment/questions';
 
 export {
   scoreAssessment,
   getZoneScore,
   getAllZoneScores,
-  calculateZoneWeights
+  calculateZoneWeights,
 } from './assessment/scoring';
 
 // ============================================================================
@@ -44,14 +44,14 @@ export {
 
 export {
   selectDailyChallenge,
-  previewChallengeSequence
+  previewChallengeSequence,
 } from './selection/algorithm';
 
 export {
   scoreChallenge,
   scoreAndRankChallenges,
   weightedRandomSelection,
-  getTimeOfDayScore
+  getTimeOfDayScore,
 } from './selection/scoring';
 
 export {
@@ -63,7 +63,7 @@ export {
   filterActiveOnly,
   applyStandardFilters,
   filterByMultipleZones,
-  filterByMultipleDifficulties
+  filterByMultipleDifficulties,
 } from './selection/filters';
 
 // ============================================================================
@@ -75,7 +75,7 @@ export {
   generateIntentionOptions,
   recommendTriggerTime,
   validateIntention,
-  generateIntentionReminder
+  generateIntentionReminder,
 } from './intentions/generator';
 
 // ============================================================================
@@ -94,5 +94,5 @@ export type {
   ChallengeSelectionContext,
   ChallengeCandidate,
   ImplementationIntention,
-  User
+  User,
 } from '@momentum/shared';
