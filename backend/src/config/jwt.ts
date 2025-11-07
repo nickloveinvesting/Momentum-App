@@ -21,9 +21,9 @@ export interface JwtPayload {
  * Generate JWT token for user
  */
 export function generateToken(payload: JwtPayload): string {
-  return jwt.sign(payload, JWT_SECRET, {
-    expiresIn: JWT_EXPIRES_IN,
-  });
+  return jwt.sign(payload, JWT_SECRET as string, {
+    expiresIn: JWT_EXPIRES_IN as string,
+  } as jwt.SignOptions);
 }
 
 /**
@@ -31,7 +31,7 @@ export function generateToken(payload: JwtPayload): string {
  */
 export function verifyToken(token: string): JwtPayload {
   try {
-    return jwt.verify(token, JWT_SECRET) as JwtPayload;
+    return jwt.verify(token, JWT_SECRET as string) as JwtPayload;
   } catch (error) {
     throw new Error('Invalid or expired token');
   }
@@ -41,7 +41,7 @@ export function verifyToken(token: string): JwtPayload {
  * Generate refresh token
  */
 export function generateRefreshToken(payload: JwtPayload): string {
-  return jwt.sign(payload, JWT_SECRET, {
-    expiresIn: JWT_REFRESH_EXPIRES_IN,
-  });
+  return jwt.sign(payload, JWT_SECRET as string, {
+    expiresIn: JWT_REFRESH_EXPIRES_IN as string,
+  } as jwt.SignOptions);
 }
