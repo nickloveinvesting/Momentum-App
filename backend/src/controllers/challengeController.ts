@@ -29,7 +29,16 @@ export const getTodaysChallengeHandler = asyncHandler(
     await initializeDailyProgress(req.user.userId);
 
     // Get today's challenge
-    const challenge = await getTodaysChallenge(req.user.userId);
+    let challenge = await getTodaysChallenge(req.user.userId);
+
+    // If no challenge exists, automatically assign one
+    if (!challenge) {
+      const { assignDailyChallenge } = await import('../services/challengeAssignmentService');
+      await assignDailyChallenge(req.user.userId);
+
+      // Retry getting the challenge
+      challenge = await getTodaysChallenge(req.user.userId);
+    }
 
     if (!challenge) {
       res.status(404).json({
