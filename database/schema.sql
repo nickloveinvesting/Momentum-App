@@ -144,8 +144,8 @@ CREATE TABLE range_progress (
   emotional_radius DECIMAL(5,1) NOT NULL DEFAULT 20,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
 
-  CONSTRAINT unique_user_day UNIQUE(user_id, day_number),
-  CONSTRAINT unique_user_date UNIQUE(user_id, date)
+  CONSTRAINT unique_range_user_day UNIQUE(user_id, day_number),
+  CONSTRAINT unique_range_user_date UNIQUE(user_id, date)
 );
 
 CREATE INDEX idx_range_progress_user_id ON range_progress(user_id);

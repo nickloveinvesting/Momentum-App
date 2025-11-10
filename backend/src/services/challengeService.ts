@@ -130,15 +130,18 @@ export async function completeChallenge(
   evidenceText?: string
 ): Promise<DailyChallenge> {
   // Evidence is optional per research (optional = adherence, required = compliance)
+  const evidenceType = evidenceText ? 'text' : null;
+  const reflectionText = evidenceText || null;
+
   const result = await query<DailyChallengeRow>(
     `UPDATE daily_challenges
      SET status = 'completed',
          completed_at = NOW(),
-         evidence_type = CASE WHEN $3 IS NOT NULL THEN 'text' ELSE NULL END,
-         reflection_text = $3
+         evidence_type = $3,
+         reflection_text = $4
      WHERE id = $1 AND user_id = $2 AND status IN ('pending', 'accepted')
      RETURNING *`,
-    [challengeId, userId, evidenceText || null]
+    [challengeId, userId, evidenceType, reflectionText]
   );
 
   if (result.rows.length === 0) {
