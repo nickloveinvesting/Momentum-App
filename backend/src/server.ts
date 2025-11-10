@@ -82,6 +82,9 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
+// Handle OPTIONS preflight requests explicitly for Vercel
+app.options('*', cors(corsOptions));
+
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' })); // Parse JSON bodies
 app.use(express.urlencoded({ extended: true, limit: '10mb' })); // Parse URL-encoded bodies
