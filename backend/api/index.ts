@@ -56,12 +56,14 @@ try {
   const challengeRoutes = require('../src/routes/challenges').default;
   const progressRoutes = require('../src/routes/progress').default;
   const journalRoutes = require('../src/routes/journal').default;
+  const assessmentRoutes = require('../src/routes/assessment').default;
 
   app.use('/api/auth', authRoutes);
   app.use('/api/users', userRoutes);
   app.use('/api/challenges', challengeRoutes);
   app.use('/api/progress', progressRoutes);
   app.use('/api/journal', journalRoutes);
+  app.use('/api/assessment', assessmentRoutes);
 
   console.log('✅ All routes loaded successfully');
 } catch (error) {
