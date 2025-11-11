@@ -122,4 +122,9 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
   });
 });
 
+// ============================================================================
+// VERCEL SERVERLESS HANDLER
+// ============================================================================
+// Export the app directly - Vercel's @vercel/node will handle it
+
 export default app;
