@@ -36,7 +36,7 @@ function getApiBaseUrl(): string {
   }
 
   // For development: use local backend or explicit env var
-  return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
+  return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
 }
 
 const API_BASE_URL = getApiBaseUrl();
