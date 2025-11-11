@@ -10,11 +10,11 @@ import compression from 'compression';
 import dotenv from 'dotenv';
 
 // Import routes directly (they'll be compiled by Vercel)
-import authRoutes from '../backend/src/routes/auth';
-import userRoutes from '../backend/src/routes/users';
-import challengeRoutes from '../backend/src/routes/challenges';
-import progressRoutes from '../backend/src/routes/progress';
-import journalRoutes from '../backend/src/routes/journal';
+import authRoutes from '../src/routes/auth';
+import userRoutes from '../src/routes/users';
+import challengeRoutes from '../src/routes/challenges';
+import progressRoutes from '../src/routes/progress';
+import journalRoutes from '../src/routes/journal';
 
 dotenv.config();
 
