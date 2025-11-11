@@ -1,9 +1,6 @@
 /**
  * Vercel Serverless Handler
  * Complete Express app for Vercel deployment
- * 
- * Routes are loaded synchronously at startup to ensure they're
- * registered before any requests arrive.
  */
 
 import express, { Application, Request, Response, NextFunction } from 'express';
@@ -12,24 +9,41 @@ import helmet from 'helmet';
 import compression from 'compression';
 import dotenv from 'dotenv';
 
+// Import routes directly (they'll be compiled by Vercel)
+import authRoutes from '../backend/src/routes/auth';
+import userRoutes from '../backend/src/routes/users';
+import challengeRoutes from '../backend/src/routes/challenges';
+import progressRoutes from '../backend/src/routes/progress';
+import journalRoutes from '../backend/src/routes/journal';
+
 dotenv.config();
 
 const app: Application = express();
 
 // ============================================================================
-// MIDDLEWARE (runs for every request)
+// MIDDLEWARE
 // ============================================================================
 
 app.use(helmet());
 
 const corsOptions = {
   origin: (origin: string | undefined, callback: any) => {
+    // Allow requests with no origin (like Postman)
     if (!origin) return callback(null, true);
-    const explicit = process.env.CORS_ORIGIN?.split(',').map(o => o.trim()) || [];
-    if (explicit.includes(origin) || explicit.includes('*') || origin?.endsWith('.vercel.app') || 
-        origin?.includes('localhost') || origin?.includes('127.0.0.1')) {
+    
+    // Allow all Vercel deployments and localhost
+    if (origin?.endsWith('.vercel.app') || 
+        origin?.includes('localhost') || 
+        origin?.includes('127.0.0.1')) {
       return callback(null, true);
     }
+    
+    // Allow explicitly configured origins
+    const explicit = process.env.CORS_ORIGIN?.split(',').map(o => o.trim()) || [];
+    if (explicit.includes(origin) || explicit.includes('*')) {
+      return callback(null, true);
+    }
+    
     callback(new Error('CORS blocked'));
   },
   credentials: true,
@@ -48,117 +62,53 @@ app.get('/health', (_req: Request, res: Response) => {
   res.json({ 
     status: 'healthy', 
     uptime: process.uptime(),
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
+    version: '2.0.0'
   });
 });
 
 app.get('/', (_req: Request, res: Response) => {
   res.json({ 
-    message: 'Momentum API', 
-    version: '1.0.0',
-    routes: '/api/auth, /api/users, /api/challenges, /api/progress, /api/journal'
+    message: 'Momentum Backend API', 
+    version: '2.0.0',
+    routes: {
+      auth: '/api/auth (register, login, me, logout)',
+      users: '/api/users',
+      challenges: '/api/challenges',
+      progress: '/api/progress',
+      journal: '/api/journal'
+    }
   });
 });
 
 // ============================================================================
-// ROUTE INITIALIZATION - Runs immediately on startup
+// API ROUTES
 // ============================================================================
 
-async function initializeRoutes() {
-  try {
-    console.log('🔄 Loading routes...');
-    
-    // Try to load routes from compiled TypeScript output
-    let authRoutes, userRoutes, challengeRoutes, progressRoutes, journalRoutes;
-    let loadedFromSrc = false;
-
-    try {
-      // Attempt 1: Load from src (source files)
-      const authModule = await import('../src/routes/auth.js');
-      const userModule = await import('../src/routes/users.js');
-      const challengeModule = await import('../src/routes/challenges.js');
-      const progressModule = await import('../src/routes/progress.js');
-      const journalModule = await import('../src/routes/journal.js');
-
-      authRoutes = authModule.default;
-      userRoutes = userModule.default;
-      challengeRoutes = challengeModule.default;
-      progressRoutes = progressModule.default;
-      journalRoutes = journalModule.default;
-      
-      loadedFromSrc = true;
-      console.log('✅ Routes loaded from src/');
-    } catch (srcError) {
-      console.log('⚠️  Failed to load from src, trying dist...');
-      
-      try {
-        // Attempt 2: Load from dist (compiled output)
-        const authModule = await import('../dist/src/routes/auth.js');
-        const userModule = await import('../dist/src/routes/users.js');
-        const challengeModule = await import('../dist/src/routes/challenges.js');
-        const progressModule = await import('../dist/src/routes/progress.js');
-        const journalModule = await import('../dist/src/routes/journal.js');
-
-        authRoutes = authModule.default;
-        userRoutes = userModule.default;
-        challengeRoutes = challengeModule.default;
-        progressRoutes = progressModule.default;
-        journalRoutes = journalModule.default;
-        
-        console.log('✅ Routes loaded from dist/');
-      } catch (distError) {
-        console.error('❌ Failed to load from dist:', distError);
-        throw distError;
-      }
-    }
-
-    // Mount all routes
-    app.use('/api/auth', authRoutes);
-    app.use('/api/users', userRoutes);
-    app.use('/api/challenges', challengeRoutes);
-    app.use('/api/progress', progressRoutes);
-    app.use('/api/journal', journalRoutes);
-
-    console.log('✅ All routes mounted successfully');
-    return true;
-  } catch (error) {
-    console.error('❌ Route initialization failed:', error);
-    
-    // Create stub routes as fallback
-    console.log('⚠️  Creating stub routes as fallback...');
-    const { Router } = await import('express');
-    
-    const stubRouter = Router();
-    stubRouter.all('*', (_req: Request, res: Response) => {
-      res.status(500).json({
-        error: 'Routes initialization failed',
-        message: 'Application not fully initialized',
-        hint: 'Check server logs for details'
-      });
-    });
-    
-    app.use('/api', stubRouter);
-    console.log('⚠️  Stub routes in place - app will return 500 until routes load');
-    return false;
-  }
-}
-
-// Initialize routes immediately
-initializeRoutes().catch(error => {
-  console.error('Fatal error during route initialization:', error);
-});
+app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/challenges', challengeRoutes);
+app.use('/api/progress', progressRoutes);
+app.use('/api/journal', journalRoutes);
 
 // ============================================================================
-// ERROR HANDLERS (after routes)
+// ERROR HANDLERS
 // ============================================================================
 
-// 404 handler - for any unmatched routes
+// 404 handler
 app.use((_req: Request, res: Response) => {
   res.status(404).json({
-    error: 'Error',
+    error: 'Not Found',
     message: `Route ${_req.method} ${_req.path} not found`,
     statusCode: 404,
-    available: ['/health', '/api/auth', '/api/users', '/api/challenges', '/api/progress', '/api/journal']
+    availableRoutes: {
+      health: '/health',
+      auth: '/api/auth/register, /api/auth/login, /api/auth/me, /api/auth/logout',
+      users: '/api/users',
+      challenges: '/api/challenges',
+      progress: '/api/progress',
+      journal: '/api/journal'
+    }
   });
 });
 
@@ -166,8 +116,8 @@ app.use((_req: Request, res: Response) => {
 app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
   console.error('[ERROR]', err.message, err.stack);
   res.status(err.statusCode || 500).json({
-    error: err.error || 'Error',
-    message: err.message || 'Internal server error',
+    error: err.error || 'Internal Server Error',
+    message: err.message || 'An unexpected error occurred',
     statusCode: err.statusCode || 500,
   });
 });
