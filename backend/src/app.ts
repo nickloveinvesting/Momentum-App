@@ -21,6 +21,7 @@ import userRoutes from './routes/users';
 import challengeRoutes from './routes/challenges';
 import progressRoutes from './routes/progress';
 import journalRoutes from './routes/journal';
+import assessmentRoutes from './routes/assessment';
 
 dotenv.config();
 
@@ -74,6 +75,7 @@ export function createApp(): Application {
   app.use('/api/challenges', challengeRoutes);
   app.use('/api/progress', progressRoutes);
   app.use('/api/journal', journalRoutes);
+  app.use('/api/assessment', assessmentRoutes);
 
   // ========================================================================
   // ERROR HANDLERS
