@@ -12,35 +12,40 @@ import dotenv from 'dotenv';
 import * as Sentry from '@sentry/node';
 
 // Import configuration
-import { initSentry } from '../src/config/sentry';
+import { initSentry } from './config/sentry';
 
 // Import middleware
-import { errorHandler, notFoundHandler } from '../src/middleware/errorHandler';
-import { publicLimiter } from '../src/middleware/rateLimiter';
+import { errorHandler, notFoundHandler } from './middleware/errorHandler';
+import { publicLimiter } from './middleware/rateLimiter';
 
 // Import routes
-import authRoutes from '../src/routes/auth';
-import userRoutes from '../src/routes/users';
-import challengeRoutes from '../src/routes/challenges';
-import progressRoutes from '../src/routes/progress';
-import journalRoutes from '../src/routes/journal';
+import authRoutes from './routes/auth';
+import userRoutes from './routes/users';
+import challengeRoutes from './routes/challenges';
+import progressRoutes from './routes/progress';
+import journalRoutes from './routes/journal';
 
 // Load environment variables
 dotenv.config();
 
-// Initialize Sentry error tracking
-initSentry();
-
 // Create Express application
 const app: Application = express();
+
+// Initialize Sentry error tracking (only if configured)
+const sentryEnabled = !!process.env.SENTRY_DSN;
+if (sentryEnabled) {
+  initSentry();
+}
 
 // ============================================================================
 // MIDDLEWARE
 // ============================================================================
 
-// Sentry request and tracing handlers (must be first)
-app.use(Sentry.Handlers.requestHandler());
-app.use(Sentry.Handlers.tracingHandler());
+// Sentry request and tracing handlers (must be first, only if enabled)
+if (sentryEnabled) {
+  app.use(Sentry.Handlers.requestHandler());
+  app.use(Sentry.Handlers.tracingHandler());
+}
 
 // Security middleware
 app.use(helmet());
@@ -113,12 +118,26 @@ app.get('/health', publicLimiter, (req: Request, res: Response) => {
   });
 });
 
+// Test endpoint to verify routing works
+app.get('/api/test', (req: Request, res: Response) => {
+  res.status(200).json({
+    message: 'Direct route test successful!',
+    path: req.path,
+    method: req.method,
+  });
+});
+
 // API Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/users', userRoutes);
-app.use('/api/challenges', challengeRoutes);
-app.use('/api/progress', progressRoutes);
-app.use('/api/journal', journalRoutes);
+try {
+  app.use('/api/auth', authRoutes);
+  app.use('/api/users', userRoutes);
+  app.use('/api/challenges', challengeRoutes);
+  app.use('/api/progress', progressRoutes);
+  app.use('/api/journal', journalRoutes);
+  console.log('✅ All routes mounted successfully');
+} catch (error) {
+  console.error('❌ Error mounting routes:', error);
+}
 
 // Welcome route
 app.get('/', publicLimiter, (req: Request, res: Response) => {
@@ -133,8 +152,10 @@ app.get('/', publicLimiter, (req: Request, res: Response) => {
 // ERROR HANDLING
 // ============================================================================
 
-// Sentry error handler
-app.use(Sentry.Handlers.errorHandler());
+// Sentry error handler (only if enabled)
+if (sentryEnabled) {
+  app.use(Sentry.Handlers.errorHandler());
+}
 
 // 404 handler
 app.use(notFoundHandler);
@@ -145,6 +166,15 @@ app.use(errorHandler);
 // ============================================================================
 // EXPORT FOR VERCEL
 // ============================================================================
+
+// Log routes for debugging
+console.log('Registered routes:');
+console.log('  GET  /health');
+console.log('  GET  /');
+console.log('  POST /api/auth/register');
+console.log('  POST /api/auth/login');
+console.log('  GET  /api/auth/me');
+console.log('  POST /api/auth/logout');
 
 // Export the Express app for Vercel serverless functions
 export default app;
