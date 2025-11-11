@@ -1,3 +1,4 @@
-# Database connection - trying simple username - Mon Nov 11 2025
-# Changed username from postgres.covkjdomhotcrfilegyw to just postgres
-# Connection: postgresql://postgres:PASSWORD@aws-1-us-east-1.pooler.supabase.com:5432/postgres
+# FINAL DATABASE CONNECTION FIX - Mon Nov 11 2025
+# Using EXACT Supabase transaction pooler string from dashboard
+# postgresql://postgres.covkjdomhotcrfilegyw:PASSWORD@aws-1-us-east-1.pooler.supabase.com:6543/postgres
+# This is the correct format directly from Supabase!
