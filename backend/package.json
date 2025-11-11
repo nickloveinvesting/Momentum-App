@@ -2,7 +2,6 @@
   "name": "@momentum/backend",
   "version": "1.0.0",
   "description": "Backend API server for Momentum App - Research-backed daily micro-action platform",
-  "main": "dist/server.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "postinstall": "cd ../shared && npm install && npm run build",
