@@ -1,1 +1,2 @@
 # Environment variable fix deployed Mon Nov 11 2025
+# Backend configured with DATABASE_URL, JWT_SECRET, CORS_ORIGIN
