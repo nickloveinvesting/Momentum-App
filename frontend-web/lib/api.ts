@@ -26,17 +26,12 @@ import type {
 function getApiBaseUrl(): string {
   // For production (Vercel): MUST be explicitly set
   if (process.env.NODE_ENV === 'production') {
-    if (!process.env.NEXT_PUBLIC_API_URL) {
-      throw new Error(
-        'FATAL: NEXT_PUBLIC_API_URL environment variable is not configured. ' +
-        'Set it in Vercel Project Settings > Environment Variables before deploying.'
-      );
-    }
-    return process.env.NEXT_PUBLIC_API_URL;
+    // Fallback to working backend if env var not set
+    return process.env.NEXT_PUBLIC_API_URL || 'https://momentum-backend-gamma.vercel.app';
   }
 
-  // For development: use local backend or explicit env var
-  return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+  // For development: use local backend
+  return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 }
 
 const API_BASE_URL = getApiBaseUrl();
@@ -102,7 +97,7 @@ apiClient.interceptors.response.use(
 
 export const authAPI = {
   register: async (data: RegisterRequest): Promise<AuthResponse> => {
-    const response = await apiClient.post<AuthResponse>('/auth/register', data);
+    const response = await apiClient.post<AuthResponse>('/api/auth/register', data);
     if (response.data.token) {
       localStorage.setItem('authToken', response.data.token);
     }
@@ -110,7 +105,7 @@ export const authAPI = {
   },
 
   login: async (data: LoginRequest): Promise<AuthResponse> => {
-    const response = await apiClient.post<AuthResponse>('/auth/login', data);
+    const response = await apiClient.post<AuthResponse>('/api/auth/login', data);
     if (response.data.token) {
       localStorage.setItem('authToken', response.data.token);
     }
@@ -122,7 +117,7 @@ export const authAPI = {
   },
 
   getCurrentUser: async (): Promise<User> => {
-    const response = await apiClient.get<User>('/auth/me');
+    const response = await apiClient.get<User>('/api/auth/me');
     return response.data;
   },
 };
@@ -133,12 +128,12 @@ export const authAPI = {
 
 export const assessmentAPI = {
   submitAssessment: async (data: AssessmentSubmission): Promise<AssessmentResult> => {
-    const response = await apiClient.post<AssessmentResult>('/assessment/submit', data);
+    const response = await apiClient.post<AssessmentResult>('/api/assessment/submit', data);
     return response.data;
   },
 
   getProfile: async (): Promise<AssessmentResult> => {
-    const response = await apiClient.get<AssessmentResult>('/assessment/profile');
+    const response = await apiClient.get<AssessmentResult>('/api/assessment/profile');
     return response.data;
   },
 };
@@ -149,18 +144,18 @@ export const assessmentAPI = {
 
 export const challengeAPI = {
   getTodayChallenge: async (): Promise<DailyChallenge | null> => {
-    const response = await apiClient.get<DailyChallenge | null>('/challenges/today');
+    const response = await apiClient.get<DailyChallenge | null>('/api/challenges/today');
     return response.data;
   },
 
   getChallengeById: async (id: string): Promise<Challenge> => {
-    const response = await apiClient.get<Challenge>(`/challenges/${id}`);
+    const response = await apiClient.get<Challenge>(`/api/challenges/${id}`);
     return response.data;
   },
 
   acceptChallenge: async (dailyChallengeId: string): Promise<DailyChallenge> => {
     const response = await apiClient.post<DailyChallenge>(
-      `/challenges/${dailyChallengeId}/accept`
+      `/api/challenges/${dailyChallengeId}/accept`
     );
     return response.data;
   },
@@ -170,7 +165,7 @@ export const challengeAPI = {
     data: ChallengeCompletionRequest
   ): Promise<DailyChallenge> => {
     const response = await apiClient.post<DailyChallenge>(
-      `/challenges/${dailyChallengeId}/complete`,
+      `/api/challenges/${dailyChallengeId}/complete`,
       data
     );
     return response.data;
@@ -178,13 +173,13 @@ export const challengeAPI = {
 
   skipChallenge: async (dailyChallengeId: string): Promise<DailyChallenge> => {
     const response = await apiClient.post<DailyChallenge>(
-      `/challenges/${dailyChallengeId}/skip`
+      `/api/challenges/${dailyChallengeId}/skip`
     );
     return response.data;
   },
 
   getChallengeHistory: async (): Promise<DailyChallenge[]> => {
-    const response = await apiClient.get<DailyChallenge[]>('/challenges/history');
+    const response = await apiClient.get<DailyChallenge[]>('/api/challenges/history');
     return response.data;
   },
 };
@@ -195,12 +190,12 @@ export const challengeAPI = {
 
 export const progressAPI = {
   getStreak: async (): Promise<Streak> => {
-    const response = await apiClient.get<Streak>('/progress/streak');
+    const response = await apiClient.get<Streak>('/api/progress/streak');
     return response.data;
   },
 
   getRangeMap: async (): Promise<RangeMap> => {
-    const response = await apiClient.get<RangeMap>('/progress/range-map');
+    const response = await apiClient.get<RangeMap>('/api/progress/range-map');
     return response.data;
   },
 
@@ -210,7 +205,7 @@ export const progressAPI = {
     currentStreak: number;
     longestStreak: number;
   }> => {
-    const response = await apiClient.get('/progress/stats');
+    const response = await apiClient.get('/api/progress/stats');
     return response.data;
   },
 };
@@ -221,12 +216,12 @@ export const progressAPI = {
 
 export const journalAPI = {
   getEntries: async (): Promise<EvidenceEntry[]> => {
-    const response = await apiClient.get<EvidenceEntry[]>('/journal/entries');
+    const response = await apiClient.get<EvidenceEntry[]>('/api/journal/entries');
     return response.data;
   },
 
   exportJournal: async (): Promise<Blob> => {
-    const response = await apiClient.get('/journal/export', {
+    const response = await apiClient.get('/api/journal/export', {
       responseType: 'blob',
     });
     return response.data;
@@ -239,17 +234,17 @@ export const journalAPI = {
 
 export const rewardsAPI = {
   getRewardCards: async (): Promise<RewardCard[]> => {
-    const response = await apiClient.get<RewardCard[]>('/rewards/cards');
+    const response = await apiClient.get<RewardCard[]>('/api/rewards/cards');
     return response.data;
   },
 
   markCardAsRead: async (cardId: string): Promise<void> => {
-    await apiClient.post(`/rewards/cards/${cardId}/read`);
+    await apiClient.post(`/api/rewards/cards/${cardId}/read`);
   },
 
   getWeeklyReport: async (weekNumber?: number): Promise<TerritoryReport> => {
     const params = weekNumber ? { weekNumber } : {};
-    const response = await apiClient.get<TerritoryReport>('/rewards/weekly-report', {
+    const response = await apiClient.get<TerritoryReport>('/api/rewards/weekly-report', {
       params,
     });
     return response.data;
@@ -266,7 +261,7 @@ export const uploadAPI = {
     formData.append('file', file);
     formData.append('type', type);
 
-    const response = await apiClient.post<{ url: string }>('/upload/evidence', formData, {
+    const response = await apiClient.post<{ url: string }>('/api/upload/evidence', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
