@@ -1,4 +1,5 @@
-# FINAL DATABASE CONNECTION FIX - Mon Nov 11 2025
-# Using EXACT Supabase transaction pooler string from dashboard
-# postgresql://postgres.covkjdomhotcrfilegyw:PASSWORD@aws-1-us-east-1.pooler.supabase.com:6543/postgres
-# This is the correct format directly from Supabase!
+# ASSESSMENT API DEPLOYMENT - Mon Nov 11 2025
+# Added assessment submission endpoint POST /api/assessment/submit
+# This deployment adds the missing assessment routes to fix onboarding completion
+# Commit: 181c85e62b411281591a560d0d6575a318f0d969
+# Force redeploy to ensure backend picks up new routes
