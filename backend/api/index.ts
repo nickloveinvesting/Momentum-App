@@ -1,153 +1,117 @@
 /**
  * Vercel Serverless Handler
- * Exports Express app for Vercel deployment
  * 
- * In Vercel's serverless environment:
- * - We export the app, don't call app.listen()
- * - Vercel handles the HTTP server and request routing
- * - This file is the entry point (api/index.ts)
+ * This file handles the Express app for Vercel's serverless environment.
+ * The app is initialized here and exported without calling app.listen().
+ * 
+ * For local development, use src/server.ts which calls app.listen(3001)
  */
 
-import express, { Application, Request, Response } from 'express';
+import express, { Application, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import compression from 'compression';
 import dotenv from 'dotenv';
 
-// Load environment variables
 dotenv.config();
 
-// Create Express app
 const app: Application = express();
 
 // ============================================================================
-// MIDDLEWARE SETUP
+// MIDDLEWARE
 // ============================================================================
 
-// Security
 app.use(helmet());
 
-// CORS - Allow Vercel deployments and localhost
 const corsOptions = {
   origin: function (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
     if (!origin) return callback(null, true);
     
-    const allowed = process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',').map(o => o.trim()) : [];
-    if (allowed.includes(origin) || allowed.includes('*') || origin.endsWith('.vercel.app') || origin.includes('localhost') || origin.includes('127.0.0.1')) {
+    const explicit = process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',').map(o => o.trim()) : [];
+    if (explicit.includes(origin) || explicit.includes('*') || origin.endsWith('.vercel.app') || 
+        origin.includes('localhost') || origin.includes('127.0.0.1')) {
       return callback(null, true);
     }
-    callback(new Error('CORS blocked'));
+    callback(new Error('CORS'));
   },
   credentials: true,
 };
-app.use(cors(corsOptions));
 
-// Body parsing
+app.use(cors(corsOptions));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-
-// Compression
 app.use(compression());
 
-// Logging
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
 
 // ============================================================================
-// HELPER: Dynamic route loading
+// BASIC ENDPOINTS
 // ============================================================================
 
-async function initializeRoutes() {
+app.get('/health', (_req: Request, res: Response) => {
+  res.json({ status: 'healthy', uptime: process.uptime() });
+});
+
+app.get('/', (_req: Request, res: Response) => {
+  res.json({ message: 'Momentum API', version: '1.0.0' });
+});
+
+// ============================================================================
+// ROUTE LOADER
+// ============================================================================
+
+let routesLoaded = false;
+
+app.use(async (req: Request, res: Response, next: NextFunction) => {
+  if (routesLoaded) {
+    return next();
+  }
+
   try {
-    // Dynamically import routes only when needed
-    const { default: authRoutes } = await import('../src/routes/auth.js');
-    const { default: userRoutes } = await import('../src/routes/users.js');
-    const { default: challengeRoutes } = await import('../src/routes/challenges.js');
-    const { default: progressRoutes } = await import('../src/routes/progress.js');
-    const { default: journalRoutes } = await import('../src/routes/journal.js');
+    // Import routes
+    const authModule = await import('../dist/routes/auth.js');
+    const userModule = await import('../dist/routes/users.js');
+    const challengeModule = await import('../dist/routes/challenges.js');
+    const progressModule = await import('../dist/routes/progress.js');
+    const journalModule = await import('../dist/routes/journal.js');
 
-    return { authRoutes, userRoutes, challengeRoutes, progressRoutes, journalRoutes };
+    // Get default exports
+    const authRoutes = authModule.default;
+    const userRoutes = userModule.default;
+    const challengeRoutes = challengeModule.default;
+    const progressRoutes = progressModule.default;
+    const journalRoutes = journalModule.default;
+
+    // Mount routes directly on app
+    app.use('/api/auth', authRoutes);
+    app.use('/api/users', userRoutes);
+    app.use('/api/challenges', challengeRoutes);
+    app.use('/api/progress', progressRoutes);
+    app.use('/api/journal', journalRoutes);
+
+    console.log('Routes loaded');
+    routesLoaded = true;
+    next();
   } catch (error) {
-    console.error('Route initialization error:', error);
-    throw error;
+    console.error('Route loading failed:', error);
+    res.status(500).json({ error: 'Server error', message: String(error) });
   }
-}
-
-let routesInitialized = false;
-let routesPromise: Promise<any> | null = null;
-
-// Middleware to ensure routes are loaded before processing requests
-app.use(async (req: Request, res: Response, next) => {
-  if (!routesInitialized) {
-    if (!routesPromise) {
-      routesPromise = initializeRoutes();
-    }
-    
-    try {
-      const routes = await routesPromise;
-      
-      // Mount routes
-      app.use('/api/auth', routes.authRoutes);
-      app.use('/api/users', routes.userRoutes);
-      app.use('/api/challenges', routes.challengeRoutes);
-      app.use('/api/progress', routes.progressRoutes);
-      app.use('/api/journal', routes.journalRoutes);
-      
-      routesInitialized = true;
-    } catch (error) {
-      console.error('Failed to initialize routes:', error);
-      return res.status(500).json({ error: 'Server initialization error' });
-    }
-  }
-  next();
-});
-
-// ============================================================================
-// BASIC ROUTES
-// ============================================================================
-
-app.get('/health', (req: Request, res: Response) => {
-  res.status(200).json({
-    status: 'healthy',
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime(),
-  });
-});
-
-app.get('/', (req: Request, res: Response) => {
-  res.json({
-    message: 'Welcome to Momentum API',
-    version: '1.0.0',
-  });
 });
 
 // ============================================================================
 // ERROR HANDLERS
 // ============================================================================
 
-// 404 Handler
-app.use((req: Request, res: Response) => {
-  res.status(404).json({
-    error: 'Error',
-    message: `Route ${req.method} ${req.path} not found`,
-    statusCode: 404,
-  });
+app.use((_req: Request, res: Response) => {
+  res.status(404).json({ error: 'Not found', statusCode: 404 });
 });
 
-// Global error handler
-app.use((err: any, req: Request, res: Response, next: any) => {
-  console.error('[ERROR]', err);
-  res.status(err.statusCode || 500).json({
-    error: err.error || 'Error',
-    message: err.message || 'Internal server error',
-    statusCode: err.statusCode || 500,
-  });
+app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+  console.error(err);
+  res.status(500).json({ error: 'Error', message: err.message, statusCode: 500 });
 });
-
-// ============================================================================
-// EXPORT FOR VERCEL
-// ============================================================================
 
 export default app;
