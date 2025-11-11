@@ -1,3 +1,3 @@
-# Database connection FINAL FIX - Mon Nov 11 2025
-# Corrected host from aws-0 to aws-1
-# Working connection: postgresql://postgres.covkjdomhotcrfilegyw:PASSWORD@aws-1-us-east-1.pooler.supabase.com:5432/postgres
+# Database connection - trying simple username - Mon Nov 11 2025
+# Changed username from postgres.covkjdomhotcrfilegyw to just postgres
+# Connection: postgresql://postgres:PASSWORD@aws-1-us-east-1.pooler.supabase.com:5432/postgres
